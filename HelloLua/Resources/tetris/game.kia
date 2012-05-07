@@ -1,0 +1,791 @@
+/* ========================================================================== */
+/*   Game logic implementation.                                               */
+/*   Copyright (c) 2012 Laurens Rodriguez Oscanoa.                            */
+/* -------------------------------------------------------------------------- */
+
+// Local reference to Platform instance.
+var Platform
+
+// Initial time delay (in milliseconds) between falling moves.
+var INIT_DELAY_FALL = 1000
+
+// Score points given by filled rows (we use the original NES * 10)
+// http://tetris.wikia.com/wiki/Scoring
+var SCORE_1_FILLED_ROW = 400
+var SCORE_2_FILLED_ROW = 1000
+var SCORE_3_FILLED_ROW = 3000
+var SCORE_4_FILLED_ROW = 12000
+
+// The player gets points every time he accelerates downfall.
+// The added points are equal to SCORE_2_FILLED_ROW divided by this value.
+var SCORE_MOVE_DOWN_DIVISOR = 1000
+
+// The player gets points every time he does a hard drop.
+// The added points are equal to SCORE_2_FILLED_ROW divided by these
+// values. If the player is not using the shadow he gets more points.
+var SCORE_DROP_DIVISOR             = 20
+var SCORE_DROP_WITH_SHADOW_DIVISOR = 100
+
+// Number of filled rows required to increase the game level.
+var FILLED_ROWS_FOR_LEVEL_UP = 10
+
+// The falling delay is multiplied and divided by
+// these factors with every level up.
+var DELAY_FACTOR_FOR_LEVEL_UP = 9
+var DELAY_DIVISOR_FOR_LEVEL_UP = 10
+
+// Delayed autoshift initial delay.
+var DAS_DELAY_TIMER = 200
+
+// Delayed autoshift timer for left and right moves.
+var DAS_MOVE_TIMER = 40
+
+// Rotation auto-repeat delay.
+var ROTATION_AUTOREPEAT_DELAY = 375
+
+// Rotation autorepeat timer.
+var ROTATION_AUTOREPEAT_TIMER = 200
+
+var NULL = 0
+
+var Game = {
+    // Playfield size (in tiles).
+    BOARD_TILEMAP_WIDTH  : 10;
+    BOARD_TILEMAP_HEIGHT : 22;
+
+    // Error codes.
+    Error : {
+        NONE         :  0,   // Everything is OK, oh wonders!
+        PLAYER_QUITS :  1,   // The user quits, our fail
+        NO_MEMORY    : -1,   // Not enough memory
+        NO_VIDEO     : -2,   // Video system was not initialized
+        NO_IMAGES    : -3,   // Problem loading the image files
+        PLATFORM     : -4,   // Problem creating platform
+        ASSERT       : -100  // Something went very very wrong...
+    };
+
+    // Game events.
+    Event : {
+        NONE        : 0,
+        MOVE_DOWN   : 1,
+        MOVE_LEFT   : 2,
+        MOVE_RIGHT  : 4,
+        ROTATE_CW   : 8,    // rotate clockwise
+        ROTATE_CCW  : 16,   // rotate counter-clockwise
+        DROP        : 32,
+        PAUSE       : 64,
+        RESTART     : 128,
+        SHOW_NEXT   : 256,  // toggle show next tetromino
+        SHOW_SHADOW : 512,  // toggle show shadow
+        QUIT        : 1024  // finish the game
+    };
+
+    // We are going to store the tetromino cells in a square matrix
+    // of this size (this is the size of the biggest tetromino).
+    TETROMINO_SIZE:  4;
+
+    // Number of tetromino types.
+    TETROMINO_TYPES: 7;
+
+    // Tetromino definitions.
+    // They are indexes and must be between: 0 - [TETROMINO_TYPES - 1]
+    // http://tetris.wikia.com/wiki/Tetromino
+    // Initial cell disposition is commented below.
+    TetrominoType: {
+        //      ....
+        //      ####
+        //      ....
+        //      ....
+        I : 0,
+        //      ##..
+        //      ##..
+        //      ....
+        //      ....
+        O : 1,
+        //      .#..
+        //      ###.
+        //      ....
+        //      ....
+        T : 2,
+        //      .##.
+        //      ##..
+        //      ....
+        //      ....
+        S : 3,
+        //      ##..
+        //      .##.
+        //      ....
+        //      ....
+        Z : 4,
+        //      #...
+        //      ###.
+        //      ....
+        //      ....
+        J : 5,
+        //      ..#.
+        //      ###.
+        //      ....
+        //      ....
+        L : 6
+    };
+
+    // Color indexes.
+    Cell: {
+        EMPTY  : -1, // This value used for empty tiles.
+        CYAN   : 1,
+        RED    : 2,
+        BLUE   : 3,
+        ORANGE : 4,
+        GREEN  : 5,
+        YELLOW : 6,
+        PURPLE : 7,
+        WHITE  : 0  // Used for effects (if any)
+    };
+
+    COLORS: 8;
+
+    // Create data structure that holds information about our tetromino blocks.
+    createTetromino: function() {
+        var tetromino = {
+            cells: {};  // Tetromino buffer
+            x: 0;
+            y: 0;
+            size: 0;
+            type: 0
+        }
+        return tetromino
+    };
+
+    // Create data structure for statistical data.
+    createStatics: function () {
+        var stats = {
+            score: 0;       // user score for current game
+            lines: 0;       // total number of lines cleared
+            totalPieces: 0; // total number of tetrominoes used
+            level: 0;       // current game level
+            pieces: {}      // number of tetrominoes per type
+        }
+        return stats
+    };
+
+    // Game events are stored in bits in this variable.
+    // It must be cleared to Game.Event.NONE after being used.
+    m_events:       0;
+
+    // Matrix that holds the cells (tilemap)
+    m_map:          NULL;
+
+    m_stats:        NULL;  // statistic data
+    m_fallingBlock: NULL;  // current falling tetromino
+    m_nextBlock:    NULL;  // next tetromino
+
+    m_stateChanged: false; // true if game state has changed
+    m_errorCode:    0;     // stores current error code
+    m_isPaused:     false; // true if the game is over
+    m_isOver:       false; // true if the game is over
+    m_showPreview:  true;  // true if we must show the preview block
+
+    m_showShadow:   true;  // true if we must show the shadow block
+    m_shadowGap:    0;     // distance between falling block and shadow
+
+    m_systemTime:   0; // system time in milliseconds
+    m_fallingDelay: 0; // delay time for falling tetrominoes
+    m_lastFallTime: 0; // last time the falling tetromino dropped
+
+    // For delayed autoshift: http://tetris.wikia.com/wiki/DAS
+    m_delayLeft:     -1;
+    m_delayRight:    -1;
+    m_delayDown:     -1;
+    m_delayRotation: -1;
+}
+
+// The platform must call this method after processing a changed state.
+function Game::onChangeProcessed()   { this.m_stateChanged = false }
+
+// Return the cell at the specified position.
+function Game::getCell(column, row)  { return this.m_map[column][row] }
+
+// Return true if the game state has changed, false otherwise.
+function Game::hasChanged()          { return this.m_stateChanged }
+
+// Return a reference to the game statistic data.
+function Game::stats()               { return this.m_stats }
+
+// Return current falling tetromino.
+function Game::fallingBlock()        { return this.m_fallingBlock }
+
+// Return next tetromino.
+function Game::nextBlock()           { return this.m_nextBlock }
+
+// Return current error code.
+function Game::errorCode()           { return this.m_errorCode }
+
+// Return true if the game is paused, false otherwise.
+function Game::isPaused()            { return this.m_isPaused }
+
+// Return true if we must show preview tetromino.
+function Game::showPreview()         { return this.m_showPreview }
+
+// Return true if we must show ghost shadow.
+function Game::showShadow()          { return this.m_showShadow }
+
+// Return height gap between shadow and falling tetromino.
+function Game::shadowGap()           { return this.m_shadowGap }
+
+// Set matrix elements to indicated value.
+function setMatrixCells(matrix, width, height, value) {
+	for (var i = 0; i < width; i += 1) {
+        matrix[i] = {}
+		for (var j = 0; j < height; j += 1) {
+			matrix[i][j] = value
+		}
+	}
+}
+
+// Bit flags utility helpers.
+function isFlagSet(set, flag) {
+    return (set % (2*flag) >= flag)
+}
+
+function setFlag(set, flag) {
+    if (set % (2*flag) >= flag) {
+        return set
+    }
+    return (set + flag)
+}
+
+function clearFlag(set, flag) {
+    if (set % (2*flag) >= flag) {
+        return (set - flag)
+    }
+    return set
+}
+
+// Initialize tetromino cells for every type of tetromino.
+function Game::setTetromino(indexTetromino, tetromino) {
+	// Initialize tetromino cells to empty cells.
+	setMatrixCells(tetromino.cells, this.TETROMINO_SIZE, this.TETROMINO_SIZE, this.Cell.EMPTY)
+
+	// Almost all the blocks have size 3.
+	tetromino.size = this.TETROMINO_SIZE - 1
+
+	// Initial configuration from: http://tetris.wikia.com/wiki/SRS
+	if (indexTetromino == this.TetrominoType.I) {
+        tetromino.cells[0][1] = this.Cell.CYAN
+        tetromino.cells[1][1] = this.Cell.CYAN
+        tetromino.cells[2][1] = this.Cell.CYAN
+        tetromino.cells[3][1] = this.Cell.CYAN
+        tetromino.size = this.TETROMINO_SIZE
+    }
+    else if (indexTetromino == this.TetrominoType.O) {
+        tetromino.cells[0][0] = this.Cell.YELLOW
+        tetromino.cells[0][1] = this.Cell.YELLOW
+        tetromino.cells[1][0] = this.Cell.YELLOW
+        tetromino.cells[1][1] = this.Cell.YELLOW
+        tetromino.size = this.TETROMINO_SIZE - 2
+    }
+    else if (indexTetromino == this.TetrominoType.T) {
+        tetromino.cells[0][1] = this.Cell.PURPLE
+        tetromino.cells[1][0] = this.Cell.PURPLE
+        tetromino.cells[1][1] = this.Cell.PURPLE
+        tetromino.cells[2][1] = this.Cell.PURPLE
+    }
+    else if (indexTetromino == this.TetrominoType.S) {
+        tetromino.cells[0][1] = this.Cell.GREEN
+        tetromino.cells[1][0] = this.Cell.GREEN
+        tetromino.cells[1][1] = this.Cell.GREEN
+        tetromino.cells[2][0] = this.Cell.GREEN
+    }
+    else if (indexTetromino == this.TetrominoType.Z) {
+        tetromino.cells[0][0] = this.Cell.RED
+        tetromino.cells[1][0] = this.Cell.RED
+        tetromino.cells[1][1] = this.Cell.RED
+        tetromino.cells[2][1] = this.Cell.RED
+    }
+    else if (indexTetromino == this.TetrominoType.J) {
+        tetromino.cells[0][0] = this.Cell.BLUE
+        tetromino.cells[0][1] = this.Cell.BLUE
+        tetromino.cells[1][1] = this.Cell.BLUE
+        tetromino.cells[2][1] = this.Cell.BLUE
+    }
+    else if (indexTetromino == this.TetrominoType.L) {
+        tetromino.cells[0][1] = this.Cell.ORANGE
+        tetromino.cells[1][1] = this.Cell.ORANGE
+        tetromino.cells[2][0] = this.Cell.ORANGE
+        tetromino.cells[2][1] = this.Cell.ORANGE
+    }
+    tetromino.type = indexTetromino
+}
+
+// Initialize the game.
+function Game::init(platform) {
+    Platform = platform
+
+	// Initialize platform.
+	Platform::init(this)
+
+    // If everything is OK start the game.
+    this::start()
+}
+
+// Start a new game.
+function Game::start() {
+	// Initialize game data.
+    this.m_map = {}
+	this.m_stats = this::createStatics()
+	this.m_fallingBlock = this::createTetromino()
+	this.m_nextBlock = this::createTetromino()
+
+	this.m_errorCode = this.Error.NONE
+	this.m_systemTime = Platform::getSystemTime()
+	this.m_lastFallTime = this.m_systemTime
+	this.m_isOver = false
+	this.m_isPaused = false
+	this.m_showPreview = true
+	this.m_events = this.Event.NONE
+	this.m_fallingDelay = INIT_DELAY_FALL
+	this.m_showShadow = true
+
+	// Initialize game statistics.
+	for each (var i = 0 to this.TETROMINO_TYPES - 1) {
+		this.m_stats.pieces[i] = 0
+	}
+
+	// Initialize game tile map.
+	setMatrixCells(this.m_map, this.BOARD_TILEMAP_WIDTH, this.BOARD_TILEMAP_HEIGHT, this.Cell.EMPTY)
+
+	// Initialize falling tetromino.
+	this::setTetromino(Platform::random() % this.TETROMINO_TYPES, this.m_fallingBlock)
+	this.m_fallingBlock.x = math.floor((this.BOARD_TILEMAP_WIDTH - this.m_fallingBlock.size) / 2)
+	this.m_fallingBlock.y = 0
+
+	// Initialize preview tetromino.
+	this::setTetromino(Platform::random() % this.TETROMINO_TYPES, this.m_nextBlock)
+
+	// Initialize events.
+	this::onTetrominoMoved()
+
+	// Initialize delayed autoshift.
+	this.m_delayLeft = -1
+	this.m_delayRight = -1
+	this.m_delayDown = -1
+	this.m_delayRotation = -1
+}
+
+// Rotate falling tetromino. If there are no collisions when the
+// tetromino is rotated this modifies the tetromino's cell buffer.
+function Game::rotateTetromino(clockwise) {
+    var i, j
+
+	// Temporary array to hold rotated cells.
+	var rotated = {}
+
+	// If TETROMINO_O is falling return immediately.
+	if (this.m_fallingBlock.type == this.TetrominoType.O) {
+		// Rotation doesn't require any changes.
+		return
+	}
+
+	// Initialize rotated cells to blank.
+	setMatrixCells(rotated, this.TETROMINO_SIZE, this.TETROMINO_SIZE, this.Cell.EMPTY)
+
+	// Copy rotated cells to the temporary array.
+	for (i = 0; i < this.m_fallingBlock.size; i += 1) {
+		for (j = 0; j < this.m_fallingBlock.size; j += 1) {
+			if (clockwise) {
+				rotated[this.m_fallingBlock.size - j - 1][i] = this.m_fallingBlock.cells[i][j]
+            }
+			else {
+				rotated[j][this.m_fallingBlock.size - i - 1] = this.m_fallingBlock.cells[i][j]
+			}
+		}
+	}
+
+	var wallDisplace = 0
+
+	// Check collision with left wall.
+	if (this.m_fallingBlock.x < 0) {
+        for (i = 0; (wallDisplace == 0) && (i < -this.m_fallingBlock.x); i += 1) {
+			for (j = 0; j < this.m_fallingBlock.size; j += 1) {
+				if (rotated[i][j] != this.Cell.EMPTY) {
+					wallDisplace = i - this.m_fallingBlock.x
+					break
+				}
+			}
+		}
+    }
+	// Or check collision with right wall.
+	else if (this.m_fallingBlock.x > this.BOARD_TILEMAP_WIDTH - this.m_fallingBlock.size) {
+		for (i = this.m_fallingBlock.size - 1; (wallDisplace == 0) && (i >= this.BOARD_TILEMAP_WIDTH - this.m_fallingBlock.x); i -= 1) {
+			for (j = 0; j < this.m_fallingBlock.size; j += 1) {
+				if (rotated[i][j] != this.Cell.EMPTY) {
+					wallDisplace = -this.m_fallingBlock.x - i + this.BOARD_TILEMAP_WIDTH - 1
+					break
+				}
+			}
+        }
+	}
+
+	// Check collision with board floor and other cells on board.
+	for (i = 0; i < this.m_fallingBlock.size; i += 1) {
+		for (j = 0; j < this.m_fallingBlock.size; j += 1) {
+			if (rotated[i][j] != this.Cell.EMPTY) {
+				// Check collision with bottom border of the map.
+				if (this.m_fallingBlock.y + j >= this.BOARD_TILEMAP_HEIGHT) {
+					// There is a collision therefore return.
+					return
+                }
+				// Check collision with existing cells in the map.
+				if (this.m_map[i + this.m_fallingBlock.x + wallDisplace][j + this.m_fallingBlock.y] != this.Cell.EMPTY) {
+					// There is a collision therefore return.
+					return
+				}
+			}
+		}
+	}
+
+	// Move the falling piece if there was wall collision and it's a legal move.
+	if (wallDisplace != 0) {
+		this.m_fallingBlock.x = this.m_fallingBlock.x + wallDisplace
+	}
+
+	// There are no collisions, replace tetromino cells with rotated cells.
+	for (i = 0; i < this.TETROMINO_SIZE; i += 1) {
+		for (j = 0; j < this.TETROMINO_SIZE; j += 1) {
+			this.m_fallingBlock.cells[i][j] = rotated[i][j]
+		}
+	}
+	this::onTetrominoMoved()
+}
+
+// Check if tetromino will collide with something if it is moved in the requested direction.
+// If there are collisions returns 1 else returns 0.
+function Game::checkCollision(dx, dy) {
+
+	var newx = this.m_fallingBlock.x + dx
+	var newy = this.m_fallingBlock.y + dy
+
+	for each (var i = 0 to this.m_fallingBlock.size - 1) {
+		for each (var j = 0 to this.m_fallingBlock.size - 1) {
+			if (this.m_fallingBlock.cells[i][j] != this.Cell.EMPTY) {
+				// Check that tetromino would be inside the left, right and bottom borders.
+				if ((newx + i < 0) || (newx + i >= this.BOARD_TILEMAP_WIDTH)
+								   || (newy + j >= this.BOARD_TILEMAP_HEIGHT)) {
+					return true
+				}
+				// Check that tetromino won't collide with existing cells in the map.
+				if (this.m_map[newx + i][newy + j] != this.Cell.EMPTY) {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+// Game scoring: http://tetris.wikia.com/wiki/Scoring
+function Game::onFilledRows(filledRows) {
+    // Update total number of filled rows.
+	this.m_stats.lines = this.m_stats.lines + filledRows
+
+	// Increase score accordingly to the number of filled rows.
+	if (filledRows == 1) {
+        this.m_stats.score = this.m_stats.score + SCORE_1_FILLED_ROW * (this.m_stats.level + 1)
+    }
+    else if (filledRows == 2) {
+        this.m_stats.score = this.m_stats.score + SCORE_2_FILLED_ROW * (this.m_stats.level + 1)
+    }
+    else if (filledRows == 3) {
+        this.m_stats.score = this.m_stats.score + SCORE_3_FILLED_ROW * (this.m_stats.level + 1)
+    }
+    else if (filledRows == 4) {
+        this.m_stats.score = this.m_stats.score + SCORE_4_FILLED_ROW * (this.m_stats.level + 1)
+    }
+    else {
+        // This shouldn't happen, but if happens kill the game.
+        this.m_errorCode = this.Error.ASSERT
+	}
+
+	// Check if we need to update the level.
+	if (this.m_stats.lines >= FILLED_ROWS_FOR_LEVEL_UP * (this.m_stats.level + 1)) {
+		this.m_stats.level = this.m_stats.level + 1
+
+		// Increase speed for falling tetrominoes.
+		this.m_fallingDelay = math.floor(DELAY_FACTOR_FOR_LEVEL_UP * this.m_fallingDelay
+                                         / DELAY_DIVISOR_FOR_LEVEL_UP)
+	}
+
+    Platform::onFilledRows(filledRows)
+}
+
+// Move tetromino in the direction specified by (x, y) (in tile units)
+// This function detects if there are filled rows or if the move
+// lands a falling tetromino, also checks for game over condition.
+function Game::moveTetromino(x, y) {
+	var i, j
+
+	// Check if the move would create a collision.
+	if (this::checkCollision(x, y)) {
+		// In case of collision check if move was downwards (y == 1)
+		if (y == 1) {
+			// Check if collision occurs when the falling
+			// tetromino is on the 1st or 2nd row.
+			if (this.m_fallingBlock.y <= 1) {
+				// If this happens the game is over.
+				this.m_isOver = true
+            }
+			else {
+				// The falling tetromino has reached the bottom,
+				// so we copy their cells to the board map.
+				for (i = 0; i < this.m_fallingBlock.size; i += 1) {
+					for (j = 0; j < this.m_fallingBlock.size; j += 1) {
+						if (this.m_fallingBlock.cells[i][j] != this.Cell.EMPTY) {
+							this.m_map[this.m_fallingBlock.x + i][this.m_fallingBlock.y + j]
+										= this.m_fallingBlock.cells[i][j]
+						}
+					}
+				}
+
+				// Check if the landing tetromino has created full rows.
+				var numFilledRows = 0
+				for (j = 1; j < this.BOARD_TILEMAP_HEIGHT; j += 1) {
+					var hasFullRow = true
+					for (i = 0; i < this.BOARD_TILEMAP_WIDTH; i += 1) {
+						if (this.m_map[i][j] == this.Cell.EMPTY) {
+							hasFullRow = false
+							break
+						}
+					}
+					// If we found a full row we need to remove that row from the map
+					// we do that by just moving all the above rows one row below.
+					if (hasFullRow) {
+						for each (var x = 0 to this.BOARD_TILEMAP_WIDTH - 1) {
+							for each (var y = j to 1, -1) {
+								this.m_map[x][y] = this.m_map[x][y - 1]
+							}
+						}
+						// Increase filled row counter.
+						numFilledRows += 1
+					}
+				}
+
+				// Update game statistics.
+				if (numFilledRows > 0) {
+					this::onFilledRows(numFilledRows)
+				}
+                else {
+                    Platform::onTetrominoLanded()
+                }
+
+				this.m_stats.totalPieces = this.m_stats.totalPieces + 1
+				this.m_stats.pieces[this.m_fallingBlock.type]
+                        = this.m_stats.pieces[this.m_fallingBlock.type] + 1
+
+				// Use preview tetromino as falling tetromino.
+				// Copy preview tetromino for falling tetromino.
+				for (i = 0; i < this.TETROMINO_SIZE; i += 1) {
+					for (j = 0; j < this.TETROMINO_SIZE; j += 1) {
+						this.m_fallingBlock.cells[i][j] = this.m_nextBlock.cells[i][j]
+					}
+				}
+				this.m_fallingBlock.size = this.m_nextBlock.size
+				this.m_fallingBlock.type = this.m_nextBlock.type
+
+				// Reset position.
+				this.m_fallingBlock.y = 0
+				this.m_fallingBlock.x = math.floor((this.BOARD_TILEMAP_WIDTH - this.m_fallingBlock.size) / 2)
+				this::onTetrominoMoved()
+
+				// Create next preview tetromino.
+				this::setTetromino(Platform::random() % this.TETROMINO_TYPES, this.m_nextBlock)
+			}
+		}
+    }
+	else {
+		// There are no collisions, just move the tetromino.
+		this.m_fallingBlock.x = this.m_fallingBlock.x + x
+		this.m_fallingBlock.y = this.m_fallingBlock.y + y
+	}
+	this::onTetrominoMoved()
+}
+
+// Hard drop.
+function Game::dropTetromino() {
+    // Shadow has already calculated the landing position.
+    this.m_fallingBlock.y = this.m_fallingBlock.y + this.m_shadowGap
+
+    // Force lock.
+    this::moveTetromino(0, 1)
+
+	// Update score.
+	if (this.m_showShadow) {
+		this.m_stats.score = this.m_stats.score + (SCORE_2_FILLED_ROW * (this.m_stats.level + 1)
+                                / SCORE_DROP_WITH_SHADOW_DIVISOR)
+    }
+	else {
+		this.m_stats.score = this.m_stats.score + (SCORE_2_FILLED_ROW * (this.m_stats.level + 1)
+                                / SCORE_DROP_DIVISOR)
+	}
+}
+
+// Main game function called every frame.
+function Game::update() {
+	// Update game state.
+	if (this.m_isOver) {
+		if (isFlagSet(this.m_events, this.Event.RESTART)) {
+			this.m_isOver = false
+			this:start()
+		}
+    }
+	else {
+		var currentTime = Platform::getSystemTime()
+
+		// Process delayed autoshift.
+		var timeDelta = currentTime - this.m_systemTime
+
+		if (this.m_delayDown > 0) {
+			this.m_delayDown = this.m_delayDown - timeDelta
+			if (this.m_delayDown <= 0) {
+				this.m_delayDown = DAS_MOVE_TIMER
+				this.m_events = setFlag(this.m_events, this.Event.MOVE_DOWN)
+			}
+		}
+
+		if (this.m_delayLeft > 0) {
+			this.m_delayLeft = this.m_delayLeft - timeDelta
+			if (this.m_delayLeft <= 0) {
+				this.m_delayLeft = DAS_MOVE_TIMER
+				this.m_events = setFlag(this.m_events, this.Event.MOVE_LEFT)
+			}
+        }
+		else if (this.m_delayRight > 0) {
+			this.m_delayRight = this.m_delayRight - timeDelta
+			if (this.m_delayRight <= 0) {
+				this.m_delayRight = DAS_MOVE_TIMER
+				this.m_events = setFlag(this.m_events, this.Event.MOVE_RIGHT)
+			}
+		}
+
+		if (this.m_delayRotation > 0) {
+			this.m_delayRotation = this.m_delayRotation - timeDelta
+			if (this.m_delayRotation <= 0) {
+				this.m_delayRotation = ROTATION_AUTOREPEAT_TIMER
+				this.m_events = setFlag(this.m_events, this.Event.ROTATE_CW)
+			}
+		}
+
+		// Always handle pause event.
+		if (isFlagSet(this.m_events, this.Event.PAUSE)) {
+			this.m_isPaused = ! this.m_isPaused
+			this.m_events = this.Event.NONE
+		}
+
+		// Check if the game is paused.
+		if (this.m_isPaused) {
+			// We achieve the effect of pausing the game
+			// adding the last frame duration to lastFallTime.
+			this.m_lastFallTime = this.m_lastFallTime + (currentTime - this.m_systemTime)
+        }
+		else {
+			if (this.m_events != this.Event.NONE) {
+				if (isFlagSet(this.m_events, this.Event.SHOW_NEXT)) {
+					this.m_showPreview = ! this.m_showPreview
+					this.m_stateChanged = true
+				}
+				if (isFlagSet(this.m_events, this.Event.SHOW_SHADOW)) {
+					this.m_showShadow = ! this.m_showShadow
+					this.m_stateChanged = true
+				}
+				if (isFlagSet(this.m_events, this.Event.DROP)) {
+					this::dropTetromino()
+				}
+				if (isFlagSet(this.m_events, this.Event.ROTATE_CW)) {
+					this::rotateTetromino(true)
+				}
+
+				if (isFlagSet(this.m_events, this.Event.MOVE_RIGHT)) {
+					this::moveTetromino(1, 0)
+                }
+				else if (isFlagSet(this.m_events, this.Event.MOVE_LEFT)) {
+					this::moveTetromino(-1, 0)
+				}
+
+				if (isFlagSet(this.m_events, this.Event.MOVE_DOWN)) {
+					// Update score if the player accelerates downfall.
+					this.m_stats.score = this.m_stats.score + (SCORE_2_FILLED_ROW * (this.m_stats.level + 1)
+                                                               / SCORE_MOVE_DOWN_DIVISOR)
+
+					this::moveTetromino(0, 1)
+				}
+				this.m_events = this.Event.NONE
+			}
+			// Check if it's time to move downwards the falling tetromino.
+			if (currentTime - this.m_lastFallTime >= this.m_fallingDelay) {
+				this::moveTetromino(0, 1)
+				this.m_lastFallTime = currentTime
+			}
+		}
+		// Save current time for next game update.
+		this.m_systemTime = currentTime
+	}
+}
+
+// This event is called when the falling tetromino is moved.
+function Game::onTetrominoMoved() {
+	var y = 1
+	// Calculate number of cells where shadow tetromino would be.
+	while (! this::checkCollision(0, y)) {
+        y += 1
+    }
+	this.m_shadowGap = y - 1
+	this.m_stateChanged = true
+}
+
+// Process a key down event.
+function Game::onEventStart(command) {
+	if (command == this.Event.QUIT) {
+        this.m_errorCode = this.Error.PLAYER_QUITS
+    }
+    else if (command == this.Event.MOVE_DOWN) {
+        this.m_events = setFlag(this.m_events, this.Event.MOVE_DOWN)
+        this.m_delayDown = DAS_DELAY_TIMER
+    }
+    else if (command == this.Event.ROTATE_CW) {
+        this.m_events = setFlag(this.m_events, this.Event.ROTATE_CW)
+        this.m_delayRotation = ROTATION_AUTOREPEAT_DELAY
+    }
+    else if (command == this.Event.MOVE_LEFT) {
+        this.m_events = setFlag(this.m_events, this.Event.MOVE_LEFT)
+        this.m_delayLeft = DAS_DELAY_TIMER
+    }
+    else if (command == this.Event.MOVE_RIGHT) {
+        this.m_events = setFlag(this.m_events, this.Event.MOVE_RIGHT)
+        this.m_delayRight = DAS_DELAY_TIMER
+    }
+    else if ((command == this.Event.DROP)
+            || (command == this.Event.RESTART)
+            || (command == this.Event.PAUSE)
+            || (command == this.Event.SHOW_NEXT)
+            || (command == this.Event.SHOW_SHADOW)) {
+        this.m_events = setFlag(this.m_events, command)
+	}
+}
+
+// Process a key up event.
+function Game::onEventEnd(command) {
+	if (command == this.Event.MOVE_DOWN) {
+        this.m_delayDown = -1
+    }
+    else if (command == this.Event.MOVE_LEFT) {
+        this.m_delayLeft = -1
+    }
+    else if (command == this.Event.MOVE_RIGHT) {
+        this.m_delayRight = -1
+    }
+    else if (command == this.Event.ROTATE_CW) {
+        this.m_delayRotation = -1
+	}
+}
+
+// Return game instance
+return Game

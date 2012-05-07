@@ -10,7 +10,9 @@
 #ifndef KLUA_H_
 #define KLUA_H_
 
+#ifndef KILLA_COMPAT_ALL
 #define KILLA_COMPAT_ALL
+#endif
 
 #define LUA_VERSION_NUM	    501
 
