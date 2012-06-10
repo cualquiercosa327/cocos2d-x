@@ -206,7 +206,7 @@ void ccDrawPoly(const CCPoint *poli, int numberOfPoints, bool closePolygon, bool
     delete[] newPoint;
 }
 
-void ccDrawCircle(const CCPoint& center, float r, float a, int segs, bool drawLineToCenter)
+void ccDrawCircle(const CCPoint& center, float r, float a, int segs, bool drawLineToCenter, bool fill)
 {
 	int additionalSegment = 1;
 	if (drawLineToCenter)
@@ -244,7 +244,7 @@ void ccDrawCircle(const CCPoint& center, float r, float a, int segs, bool drawLi
 	glDisableClientState(GL_COLOR_ARRAY);
 	
 	glVertexPointer(2, GL_FLOAT, 0, vertices);	
-	glDrawArrays(GL_LINE_STRIP, 0, (GLsizei) segs+additionalSegment);
+    glDrawArrays(fill? GL_TRIANGLE_FAN : GL_LINE_STRIP, 0, (GLsizei) segs+additionalSegment);
 	
 	// restore default state
 	glEnableClientState(GL_COLOR_ARRAY);

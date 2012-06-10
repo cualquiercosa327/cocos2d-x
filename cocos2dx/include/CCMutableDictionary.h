@@ -186,7 +186,7 @@ public:
 	* end is a keyword of lua, so should use other name
 	* to export to lua
 	*/
-	void endToLua()
+	void finish()
 	{
 		end();
 	} 

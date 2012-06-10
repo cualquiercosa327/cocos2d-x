@@ -69,7 +69,7 @@ The polygon can be closed or open and optionally filled with current GL color
 void CC_DLL ccDrawPoly( const CCPoint *vertices, int numOfVertices, bool closePolygon , bool fill);
 
 /** draws a circle given the center, radius and number of segments. */
-void CC_DLL ccDrawCircle( const CCPoint& center, float radius, float angle, int segments, bool drawLineToCenter);
+void CC_DLL ccDrawCircle( const CCPoint& center, float radius, float angle, int segments, bool drawLineToCenter, bool fill = false);
 
 /** draws a quad bezier path
  @since v0.8

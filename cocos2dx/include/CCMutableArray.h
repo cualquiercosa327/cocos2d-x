@@ -279,7 +279,7 @@ public:
 	 * end is a keyword of lua, so should use other name
 	 * to export to lua
 	*/
-	inline CCMutableArrayIterator endToLua(void)
+	inline CCMutableArrayIterator finish(void)
 	{
 		return m_array.end();
 	}

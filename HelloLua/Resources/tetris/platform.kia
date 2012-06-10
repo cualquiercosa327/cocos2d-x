@@ -85,6 +85,7 @@ var Platform = {
 
     // We draw the game state over this rendering target object.
     m_canvas:   NULL;
+    m_canvas2:   NULL;
 }
 
 // Logging messages
@@ -168,6 +169,12 @@ function Platform::createGameLayer(scene) {
     // Create a render texture to draw the game state.
     this.m_canvas = CCRenderTexture::renderTextureWithWidthAndHeight(size.width, size.height)
     this.m_canvas::setPosition(size.width/2, size.height/2)
+
+this.m_canvas2 = CCRenderTexture::renderTextureWithWidthAndHeight(size.width, size.height)
+this.m_canvas2::setPosition(size.width/2, size.height/2)
+this.m_canvas2::setPointSize(1);
+scene::addChild(this.m_canvas2, 2)
+this::testPrimitiveDrawing()
 
     // Note that the render texture is a cocos node, and contains a sprite of it's texture 
     // for convience, so we can just parent it to the scene like any other cocos node.
@@ -309,6 +316,36 @@ function Platform::drawNumber(x, y, number, length, color) {
         pos += 1
 
     } while (pos < length)
+}
+
+function Platform::testPrimitiveDrawing() {
+    this.m_canvas2::begin()
+//    for (var x = 0; x < 300; x += 1) {
+//        for (var y = 0; y < 300; y += 1) {
+//            this.m_canvas2::drawPoint(x, y, math.random(255)/255, math.random(255)/255, math.random(255)/255)
+//        }
+//    }
+//    this.m_canvas2::setLineWidth(6)
+//    for (var y = 0; y < 320; y += 10) {
+//        this.m_canvas2::setColor(math.random(255)/255, math.random(255)/255, math.random(255)/255)
+//        this.m_canvas2::drawLine(0, y, 400, y + 15)
+//    }
+//    this.m_canvas2::setLineWidth(3)
+//    for each (var k = 0 to 20) {
+//        this.m_canvas2::setColor(math.random(255)/255, math.random(255)/255, math.random(255)/255)
+////        this.m_canvas2::drawCircle(math.random(400), math.random(300), 10+math.random(50), 2+math.random(3), 3*math.random(), true)
+////        this.m_canvas2::drawCircle(math.random(400), math.random(300), 10+math.random(50), 2+math.random(3), 3*math.random())
+//        this.m_canvas2::drawCircle(math.random(400), math.random(300), 20+math.random(30), 30, 0, true)
+//    }
+    this.m_canvas2::setLineWidth(1)
+    for each (var k = 0 to 20) {
+        this.m_canvas2::setColor(math.random(255)/255, math.random(255)/255, math.random(255)/255)
+//        this.m_canvas2::drawQuadBezier(0, math.random(300), 200 - math.random(100), math.random(300), 400, math.random(400), 10)
+//        this.m_canvas2::drawCubicBezier(0, math.random(320), 150 - math.random(50), math.random(300), 150 - math.random(50), math.random(300), 400, math.random(400), 10)
+//        this.m_canvas2::drawTriangle(math.random(200), math.random(320), 100+math.random(200), math.random(320), 200+math.random(100), math.random(320), true)
+        this.m_canvas2::drawRectangle(math.random(200), math.random(160), math.random(200), math.random(160))
+    }
+    this.m_canvas2::finish()
 }
 
 // Render the state of the game using platform functions.

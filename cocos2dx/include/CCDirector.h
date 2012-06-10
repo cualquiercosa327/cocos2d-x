@@ -285,7 +285,7 @@ public:
 	 */
 
 	/* end is key word of lua, use other name to export to lua. */
-	inline void endToLua(void){end();}
+	inline void finish(void) { end(); }
 
 	void end(void);
 
