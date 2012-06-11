@@ -7,7 +7,7 @@ var cclog = function(...) {
     print(string.format(...))
 }
 
-require("hello2")
+require("hello/hello2")
 cclog("result is " .. myadd(3, 5))
 
 
@@ -19,7 +19,7 @@ function creatDog() {
     var frameHeight = 95
 
     // create dog animate
-    var textureDog = CCTextureCache::sharedTextureCache()::addImage("dog.png")
+    var textureDog = CCTextureCache::sharedTextureCache()::addImage("hello/dog.png")
     var rect = CCRectMake(0, 0, frameWidth, frameHeight)
     var frame0 = CCSpriteFrame::frameWithTexture(textureDog, rect)
     rect = CCRectMake(frameWidth, 0, frameWidth, frameHeight)
@@ -60,21 +60,21 @@ function createLayerFram() {
     var layerFarm = CCLayer::node()
 
     // add in farm background
-    var bg = CCSprite::spriteWithFile("farm.jpg")
+    var bg = CCSprite::spriteWithFile("hello/farm.jpg")
     bg::setPosition(winSize.width / 2 + 80, winSize.height / 2)
     layerFarm::addChild(bg)
 
     // add land sprite
     for each (var i = 0 to 3) {
         for each (var j = 0 to 1) {
-            var spriteLand = CCSprite::spriteWithFile("land.png")
+            var spriteLand = CCSprite::spriteWithFile("hello/land.png")
             spriteLand::setPosition(200 + j * 180 - i % 2 * 90, 10 + i * 95 / 2)
             layerFarm::addChild(spriteLand)
         }
     }
 
     // add crop
-    var textureCrop = CCTextureCache::sharedTextureCache()::addImage("crop.png")
+    var textureCrop = CCTextureCache::sharedTextureCache()::addImage("hello/crop.png")
     var frameCrop = CCSpriteFrame::frameWithTexture(textureCrop, CCRectMake(0, 0, 105, 95))
     for each (var i = 0 to 3) {
         for each (var j = 0 to 1) {
@@ -146,12 +146,12 @@ function createLayerMenu() {
 
     function menuCallbackOpenPopup() {
         // loop test sound effect
-        effectID = SimpleAudioEngine::sharedEngine()::playEffect("effect1.wav")
+        effectID = SimpleAudioEngine::sharedEngine()::playEffect("hello/effect1.wav")
         menuPopup::setIsVisible(true)
     }
 
     // add a popup menu
-    var menuPopupItem = CCMenuItemImage::itemFromNormalImage("menu2.png", "menu2.png")
+    var menuPopupItem = CCMenuItemImage::itemFromNormalImage("hello/menu2.png", "hello/menu2.png")
     menuPopupItem::setPosition(0, 0)
     menuPopupItem::registerScriptHandler(menuCallbackClosePopup)
     menuPopup = CCMenu::menuWithItem(menuPopupItem)
@@ -160,7 +160,7 @@ function createLayerMenu() {
     layerMenu::addChild(menuPopup)
 
     // add the left-bottom "tools" menu to invoke menuPopup
-    var menuToolsItem = CCMenuItemImage::itemFromNormalImage("menu1.png", "menu1.png")
+    var menuToolsItem = CCMenuItemImage::itemFromNormalImage("hello/menu1.png", "hello/menu1.png")
     menuToolsItem::setPosition(0, 0)
     menuToolsItem::registerScriptHandler(menuCallbackOpenPopup)
     menuTools = CCMenu::menuWithItem(menuToolsItem)
@@ -171,8 +171,8 @@ function createLayerMenu() {
 }
 
 // play background music, preload effect
-SimpleAudioEngine::sharedEngine()::playBackgroundMusic("background.mp3", true);
-SimpleAudioEngine::sharedEngine()::preloadEffect("effect1.wav");
+SimpleAudioEngine::sharedEngine()::playBackgroundMusic("hello/background.mp3", true);
+SimpleAudioEngine::sharedEngine()::preloadEffect("hello/effect1.wav");
 
 // run
 var sceneGame = CCScene::node()

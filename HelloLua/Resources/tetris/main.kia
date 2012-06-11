@@ -29,7 +29,7 @@
 /*   OTHER DEALINGS IN THE SOFTWARE.                                          */
 /* -------------------------------------------------------------------------- */
 
-var game     = require("game")
-var platform = require("platform")
+var game     = require('tetris/game')
+var platform = require('tetris/platform')
 
 game::init(platform)

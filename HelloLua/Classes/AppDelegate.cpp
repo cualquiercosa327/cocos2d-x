@@ -44,7 +44,7 @@ bool AppDelegate::initInstance()
         // Initialize OpenGLView instance, that release by CCDirector when application terminate.
         // The HelloWorld is designed as HVGA.
         CCEGLView * pMainWnd = new CCEGLView();
-        CC_BREAK_IF(! pMainWnd || ! pMainWnd->Create(TEXT("STC: cocos2d-x Killa"), CC_WIDTH, CC_HEIGHT));
+        CC_BREAK_IF(! pMainWnd || ! pMainWnd->Create(TEXT("cocos2d-x Killa"), CC_WIDTH, CC_HEIGHT));
 
 #endif  // CC_PLATFORM_WIN32
         
@@ -125,10 +125,9 @@ bool AppDelegate::applicationDidFinishLaunching()
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_IOS) || (CC_TARGET_PLATFORM == CC_PLATFORM_MARMALADE)
 #ifdef KILLA
-	string path = CCFileUtils::fullPathFromRelativePath("tetris/main.kia");
-	////string path = CCFileUtils::fullPathFromRelativePath("hello.kia");
+	string path = CCFileUtils::fullPathFromRelativePath("boot.kia");
 #else
-	string path = CCFileUtils::fullPathFromRelativePath("hello.lua");
+	string path = CCFileUtils::fullPathFromRelativePath("boot.lua");
 #endif
 
     pEngine->addSearchPath(path.substr(0, path.find_last_of("/")).c_str());

@@ -7,7 +7,7 @@ local cclog = function(...)
     print(string.format(...))
 end
 
-require "hello2"
+require "hello/hello2"
 cclog("result is " .. myadd(3, 5))
 
 ---------------
@@ -20,7 +20,7 @@ local function creatDog()
     local frameHeight = 95
 
     -- create dog animate
-    local textureDog = CCTextureCache:sharedTextureCache():addImage("dog.png")
+    local textureDog = CCTextureCache:sharedTextureCache():addImage("hello/dog.png")
     local rect = CCRectMake(0, 0, frameWidth, frameHeight)
     local frame0 = CCSpriteFrame:frameWithTexture(textureDog, rect)
     rect = CCRectMake(frameWidth, 0, frameWidth, frameHeight)
@@ -60,21 +60,21 @@ local function createLayerFram()
     local layerFarm = CCLayer:node()
 
     -- add in farm background
-    local bg = CCSprite:spriteWithFile("farm.jpg")
+    local bg = CCSprite:spriteWithFile("hello/farm.jpg")
     bg:setPosition(winSize.width / 2 + 80, winSize.height / 2)
     layerFarm:addChild(bg)
 
     -- add land sprite
     for i = 0, 3 do
         for j = 0, 1 do
-            local spriteLand = CCSprite:spriteWithFile("land.png")
+            local spriteLand = CCSprite:spriteWithFile("hello/land.png")
             spriteLand:setPosition(200 + j * 180 - i % 2 * 90, 10 + i * 95 / 2)
             layerFarm:addChild(spriteLand)
         end
     end
 
     -- add crop
-    local textureCrop = CCTextureCache:sharedTextureCache():addImage("crop.png")
+    local textureCrop = CCTextureCache:sharedTextureCache():addImage("hello/crop.png")
     local frameCrop = CCSpriteFrame:frameWithTexture(textureCrop, CCRectMake(0, 0, 105, 95))
     for i = 0, 3 do
         for j = 0, 1 do
@@ -146,12 +146,12 @@ local function createLayerMenu()
 
     local function menuCallbackOpenPopup()
         -- loop test sound effect
-        effectID = SimpleAudioEngine:sharedEngine():playEffect("effect1.wav")
+        effectID = SimpleAudioEngine:sharedEngine():playEffect("hello/effect1.wav")
         menuPopup:setIsVisible(true)
     end
 
     -- add a popup menu
-    local menuPopupItem = CCMenuItemImage:itemFromNormalImage("menu2.png", "menu2.png")
+    local menuPopupItem = CCMenuItemImage:itemFromNormalImage("hello/menu2.png", "hello/menu2.png")
     menuPopupItem:setPosition(0, 0)
     menuPopupItem:registerScriptHandler(menuCallbackClosePopup)
     menuPopup = CCMenu:menuWithItem(menuPopupItem)
@@ -160,7 +160,7 @@ local function createLayerMenu()
     layerMenu:addChild(menuPopup)
 
     -- add the left-bottom "tools" menu to invoke menuPopup
-    local menuToolsItem = CCMenuItemImage:itemFromNormalImage("menu1.png", "menu1.png")
+    local menuToolsItem = CCMenuItemImage:itemFromNormalImage("hello/menu1.png", "hello/menu1.png")
     menuToolsItem:setPosition(0, 0)
     menuToolsItem:registerScriptHandler(menuCallbackOpenPopup)
     menuTools = CCMenu:menuWithItem(menuToolsItem)
@@ -171,8 +171,8 @@ local function createLayerMenu()
 end
 
 -- play background music, preload effect
-SimpleAudioEngine:sharedEngine():playBackgroundMusic("background.mp3", true);
-SimpleAudioEngine:sharedEngine():preloadEffect("effect1.wav");
+SimpleAudioEngine:sharedEngine():playBackgroundMusic("hello/background.mp3", true);
+SimpleAudioEngine:sharedEngine():preloadEffect("hello/effect1.wav");
 
 -- run
 local sceneGame = CCScene:node()

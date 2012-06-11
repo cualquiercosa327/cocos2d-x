@@ -1,0 +1,457 @@
+/* ========================================================================== */
+/*   Mandelbrot.as                                                            */
+/* -------------------------------------------------------------------------- */
+/*   Copyright (c) 2012 Laurens Rodriguez Oscanoa.                            */
+/*   This code is licensed under the MIT license:                             */
+/*   http://www.opensource.org/licenses/mit-license.php                       */
+/* -------------------------------------------------------------------------- */
+
+var INIT_STEPS = 32
+var INCREMENT_STEPS = 64
+
+var MINIMUM_COLOR_STEP = 5
+var COLOR_RANGE = 64
+var COLOR_STEP = 6
+
+var COLOR_BLUE   = 1
+var COLOR_RED    = 2
+var COLOR_GREEN  = 3
+var COLOR_GRAY   = 4
+var COLOR_RANDOM = 5
+var COLOR_PALETTE = 6
+
+var MINIMUM_CELL_SIZE = 9e-15
+
+var ZOOM_FACTOR = 0.5
+
+//------------------------------------------------------------------------------
+var m_width  // canvas width
+var m_height // canvas height
+
+var m_canvas // node where the fractal is drawn
+
+var m_colors // palette of colors
+var m_colorSteps
+
+// Number of iterations for computing a pixel of the fractal.
+var m_steps
+
+// Fractal zone coordinates
+var m_fractalZoneX1
+var m_fractalZoneY1
+var m_fractalZoneX2
+var m_fractalZoneY2
+
+var m_zoomIsVisible
+
+// Fractal zones history.
+// Each element is an array with the zone coordinates: [x1, y1, x2, y2]
+var m_zones
+
+// Some nice palette colors
+var m_palette
+
+//------------------------------------------------------------------------------
+// Logging messages
+function log(...) {
+    CCLuaLog(string.format(...))
+}
+
+function drawZoomZone(x, y) {
+    var x1 = x - ZOOM_FACTOR * m_width / 2
+    var y1 = y - ZOOM_FACTOR * m_height / 2
+
+    m_canvas::begin()
+    m_canvas::setColor(1.0, 1.0, 1.0)
+    m_canvas::drawRectangle(x1, y1, ZOOM_FACTOR*m_width, ZOOM_FACTOR*m_height)
+    m_canvas::finish()
+}
+
+function drawMandelbrot(initializeZone) {
+
+    if (initializeZone) {
+        m_fractalZoneX1 = -2.3
+        m_fractalZoneY1 = -1.2
+        m_fractalZoneX2 = 1.3
+        m_fractalZoneY2 = 1.2
+    }
+
+    var dx = (m_fractalZoneX2 - m_fractalZoneX1) / (m_width - 1)
+    var dy = (m_fractalZoneY2 - m_fractalZoneY1) / (m_height - 1)
+
+    m_canvas::beginWithClear(0, 0, 0, 1)
+
+    var px, py
+    var steps
+    var fx, fy
+    var temp
+
+    // Draw fractal zone
+    for (var x = 0; x < m_width; x += 1) {
+        for (var y = 0; y < m_height; y += 1) {
+            // Point in fractal zone
+            px = m_fractalZoneX1 + x * dx
+            py = m_fractalZoneY1 + y * dy
+
+            // Iterate fractal computation.
+            steps = 0
+            fx = 0.0
+            fy = 0.0
+
+            while (true) {
+                // Mandelbrot recurrence:
+                // ---------------------
+                // F(n+1) = F(n)*F(n) + (px + i*py)
+                temp = fx*fx - fy*fy + px
+                fy = 2*fx*fy + py
+                fx = temp
+
+                steps += 1
+
+                // F(z) belongs to Mandelbrot set if |F(z)| < 2
+                // We give up if we passed the limit of number of iterations.
+                if ((steps >= m_steps) || (fx*fx + fy*fy >= 4.0)) {
+                    break;
+                }
+            }
+
+            if (steps < m_steps) {
+                // We found that: |F(z)| >= 2 (the point doesn't belong to 
+                // the Mandelbrot set)
+                var indexColor = (steps - 1) % 28 + 1
+                if (indexColor > 15) {
+                    indexColor = 30 - indexColor
+                }
+                m_canvas::drawPoint(x, y,
+                                    m_colors[indexColor][0]/255, 
+                                    m_colors[indexColor][1]/255,
+                                    m_colors[indexColor][2]/255)
+            }
+            else {
+                // We suspect this point belongs to the Mandelbrot set.
+                // We can't be sure because the point can belong to the set if 
+                // the number of iteration steps is increased.
+                // Leave this pixel in black.
+            }
+        }
+    }
+    m_canvas::finish()
+}
+
+function redraw(fx, fy) {
+
+    // If the zoom grid is visible we want to redraw the zoom zone.
+    var dx = ZOOM_FACTOR * (m_fractalZoneX2 - m_fractalZoneX1) / 2
+    var dy = ZOOM_FACTOR * (m_fractalZoneY2 - m_fractalZoneY1) / 2
+
+    if ((dx >= MINIMUM_CELL_SIZE) && (dy >= MINIMUM_CELL_SIZE)) {
+
+        // Save actual zone position
+        table.insert(m_zones, [m_fractalZoneX1, m_fractalZoneY1, 
+                               m_fractalZoneX2, m_fractalZoneY2])
+
+        // Set new drawing zone:
+        // (x1,y1) bottom-left corner, (x2,y2) up-right corner
+        var cx = fx * (m_fractalZoneX2 - m_fractalZoneX1)
+        var cy = fy * (m_fractalZoneY2 - m_fractalZoneY1)
+
+        m_fractalZoneX2 = m_fractalZoneX1 + cx + dx
+        m_fractalZoneY2 = m_fractalZoneY1 + cy + dy
+        m_fractalZoneX1 += cx - dx
+        m_fractalZoneY1 += cy - dy
+
+        drawMandelbrot()
+    }
+}
+
+function increaseSteps(increment) {
+    if (m_steps + increment > 0) {
+        m_steps += increment
+        drawMandelbrot()
+    }
+}
+
+function zoomOut() {
+    if ($m_zones > 0) {
+        var zone = table.remove(m_zones)
+        m_fractalZoneX1 = zone[0]
+        m_fractalZoneY1 = zone[1]
+        m_fractalZoneX2 = zone[2]
+        m_fractalZoneY2 = zone[3]
+    }
+    else {
+        var dx = (m_fractalZoneX2 - m_fractalZoneX1)/2
+        var dy = (m_fractalZoneY2 - m_fractalZoneY1)/2
+        m_fractalZoneX1 -= dx
+        m_fractalZoneY1 -= dy
+        m_fractalZoneX2 += dx
+        m_fractalZoneY2 += dy
+    }
+    drawMandelbrot()
+}
+
+function setColors(opc) {
+    var k
+    m_colors = []
+
+    if (opc == COLOR_GRAY) {
+        for (k = 0; k < 16; k += 1) {
+            table.insert(m_colors, [4*m_colorSteps[k][1], 
+                         4*m_colorSteps[k][1], 4*m_colorSteps[k][1]])
+        }
+    }
+    else if (opc == COLOR_BLUE) {
+        for (k = 0; k < 16; k += 1) {
+            table.insert(m_colors, [4*m_colorSteps[k][0], 
+                         4*m_colorSteps[k][1], 4*m_colorSteps[k][2]])
+        }
+    }
+    else if (opc == COLOR_RED) {
+        for (k = 0; k < 16; k += 1) {
+            table.insert(m_colors, [4*m_colorSteps[k][2], 
+                         13 * k, 3*m_colorSteps[k][0]])
+        }
+    }
+    else if (opc == COLOR_GREEN) {
+        for (k = 0; k < 16; k += 1) {
+            table.insert(m_colors, [14 * k, 4*m_colorSteps[k][2], 
+                         4*m_colorSteps[k][0]])
+        }
+    }
+    else if (opc == COLOR_RANDOM) {
+        var c1, c2, c3
+        do {
+            c1 = math.random(COLOR_STEP) - 1
+            c2 = math.random(COLOR_STEP) - 1
+            c3 = math.random(COLOR_STEP) - 1
+
+        } while ((c1 + c2 + c3) < MINIMUM_COLOR_STEP)
+
+        table.insert(m_colors, [0, 0, 0]) // base color is black
+
+        var a1 = math.random(COLOR_RANGE) - 1
+        var a2 = math.random(COLOR_RANGE) - 1
+        var a3 = math.random(COLOR_RANGE) - 1
+
+        // Fill color table.
+        for (k = 1; k < 16; k += 1) {
+            var t1 = (a1 + (k-1) * c1) % (COLOR_RANGE * 2)
+            var t2 = (a2 + (k-1) * c2) % (COLOR_RANGE * 2)
+            var t3 = (a3 + (k-1) * c3) % (COLOR_RANGE * 2)
+
+            if (t1 >= COLOR_RANGE) {
+                t1 = (COLOR_RANGE * 2) - t1 - 1
+            }
+            if (t2 >= COLOR_RANGE) {
+                t2 = (COLOR_RANGE * 2) - t2 - 1
+            }
+            if (t3 >= COLOR_RANGE) {
+                t3 = (COLOR_RANGE * 2) - t3 - 1
+            }
+            table.insert(m_colors, [4*t1, 4*t2, 4*t3])
+        }
+    }
+    else if (opc == COLOR_PALETTE) {
+        var palette = math.random($m_palette) - 1
+        table.insert(m_colors, [0, 0, 0]) // base color is black
+
+        // Fill color table.
+        for (k = 1; k < 16; k += 1) {
+            var p1 = (m_palette[palette][0] 
+                      + (k-1) * m_palette[palette][1]) % (COLOR_RANGE * 2)
+            var p2 = (m_palette[palette][2] 
+                      + (k-1) * m_palette[palette][3]) % (COLOR_RANGE * 2)
+            var p3 = (m_palette[palette][4] 
+                      + (k-1) * m_palette[palette][5]) % (COLOR_RANGE * 2)
+
+            if (p1 >= COLOR_RANGE) {
+                p1 = (COLOR_RANGE * 2) - p1 - 1
+            }
+            if (p2 >= COLOR_RANGE) {
+                p2 = (COLOR_RANGE * 2) - p2 - 1
+            }
+            if (p3 >= COLOR_RANGE) {
+                p3 = (COLOR_RANGE * 2) - p3 - 1
+            }
+            table.insert(m_colors, [4*p1, 4*p2, 4*p3])
+        }
+    }
+}
+
+function initializeColorData() {
+    m_palette = [
+        [0, 4, 62, 5, 31, 3],  [7, 4, 4, 4, 42, 5],   [8, 0, 55, 4, 4, 4],   
+        [8, 5, 8, 4, 8, 1],    [12, 4, 44, 2, 46, 3], [17, 4, 35, 5, 41, 4], 
+        [20, 5, 43, 4, 57, 3], [20, 5, 58, 5, 21, 2], [21, 2, 35, 4, 59, 0], 
+        [24, 4, 53, 2, 54, 3], [25, 2, 36, 2, 50, 2], [25, 5, 52, 5, 0, 5],  
+        [27, 3, 19, 3, 31, 5], [27, 3, 35, 4, 39, 2], [29, 5, 63, 2, 34, 2],
+        [32, 5, 58, 5, 33, 2], [33, 5, 61, 5, 34, 3], [35, 2, 16, 5, 22, 0],
+        [35, 4, 2, 0, 10, 3],  [36, 4, 43, 4, 35, 2], [38, 4, 63, 3, 55, 5], 
+        [39, 5, 8, 2, 48, 2],  [39, 5, 59, 3, 7, 2],  [40, 3, 6, 0, 61, 5], 
+        [40, 5, 58, 5, 25, 2], [41, 2, 49, 5, 52, 3], [41, 5, 59, 5, 0, 3],
+        [43, 5, 56, 3, 43, 4], [44, 2, 11, 3, 54, 4], [44, 4, 61, 4, 13, 2],
+        [45, 3, 61, 3, 10, 1], [45, 4, 63, 5, 6, 3],  [45, 5, 46, 5, 11, 0],
+        [46, 3, 5, 5, 17, 3],  [47, 1, 30, 4, 14, 0], [48, 5, 58, 5, 17, 2],
+        [48, 5, 63, 4, 6, 4],  [48, 5, 63, 5, 6, 4],  [49, 3, 17, 4, 38, 2],
+        [50, 2, 63, 5, 57, 3], [51, 5, 62, 3, 37, 0], [53, 1, 56, 5, 13, 1], 
+        [53, 3, 57, 2, 49, 1], [53, 3, 56, 5, 44, 2], [54, 4, 1, 0, 33, 3],
+        [54, 5, 53, 4, 45, 2], [55, 4, 13, 0, 4, 4],  [55, 4, 40, 5, 34, 2],
+        [55, 5, 57, 2, 56, 2], [57, 2, 14, 3, 20, 0], [58, 1, 15, 5, 9, 2], 
+        [58, 3, 38, 4, 13, 4], [59, 0, 48, 5, 6, 2],  [59, 3, 3, 0, 6, 3],  
+        [59, 5, 4, 4, 60, 0],  [59, 5, 52, 3, 5, 0],  [60, 1, 51, 5, 0, 3], 
+        [60, 5, 14, 2, 24, 3], [61, 5, 42, 5, 24, 3], [63, 4, 14, 3, 0, 5]
+    ]
+
+    m_colorSteps = [
+        [ 0,  0,  0], [10,  8, 23], [13, 16, 36], [15, 18, 41],
+        [17, 21, 46], [18, 23, 49], [20, 26, 50], [22, 29, 52],
+        [24, 35, 55], [22, 40, 58], [20, 45, 60], [17, 46, 61],
+        [16, 47, 62], [25, 52, 62], [38, 58, 63], [63, 63, 63]
+    ]
+}
+
+//------------------------------------------------------------------------------
+function onTouchBegan(tx, ty) {
+    if (!m_zoomIsVisible) {
+        m_zoomIsVisible = true
+        drawZoomZone(tx, ty)
+
+        // The closures below control the zoom enable/disable process
+        var idSelector
+        var scheduler
+        function refresh() {
+            CCScheduler::sharedScheduler()::unscheduleScriptEntry(idSelector)
+            redraw(tx / m_width, ty / m_height)
+            
+            function enableZoom() {
+                CCScheduler::sharedScheduler()::unscheduleScriptEntry(idSelector)
+                m_zoomIsVisible = false
+            }
+            // Give a little rest before enabling zoom
+            idSelector = scheduler::scheduleScriptFunc(enableZoom, 0.1, false)
+        }
+        scheduler = CCScheduler::sharedScheduler()
+        // Show the zoom area
+        idSelector = scheduler::scheduleScriptFunc(refresh, 0.05, false)
+    }
+    return true // CCTOUCHBEGAN event must return true
+}
+
+function init() {
+    // Initialize random generator
+    math.randomseed(os.time())
+
+    // Avoid memory leaks
+    collectgarbage("setpause", 100)
+    collectgarbage("setstepmul", 5000)
+
+    // Disable FPS label.
+    CCDirector::sharedDirector()::setDisplayFPS(false)
+
+    // Get size.
+    var size = CCDirector::sharedDirector()::getWinSize()
+    m_width = size.width
+    m_height = size.height
+
+    //--------------------------------------------------------------------------
+    // Create scene
+    var scene = CCScene::node()
+    CCDirector::sharedDirector()::runWithScene(scene)
+
+    m_canvas = CCRenderTexture::renderTextureWithWidthAndHeight(m_width, m_height)
+    m_canvas::setPosition(m_width/2, m_height/2)
+    m_canvas::setPointSize(1);
+    scene::addChild(m_canvas, 1)
+
+    m_steps = INIT_STEPS
+    m_zones = []
+    m_zoomIsVisible = false
+
+    //--------------------------------------------------------------------------
+    // Create menu of buttons on screen
+    //
+    var btnPalette = CCMenuItemImage::itemFromNormalImage(
+                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
+    btnPalette::setPosition(-m_width / 2 + 16, -m_height / 2 + 16);
+    function onBtnPaletteClicked() {
+        setColors(COLOR_PALETTE)
+        drawMandelbrot()
+    }
+    btnPalette::registerScriptHandler(onBtnPaletteClicked)
+
+    var btnRandom = CCMenuItemImage::itemFromNormalImage(
+                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
+    btnRandom::setPosition(-m_width / 2 + 16, m_height / 2 - 16);
+    function onBtnRandomClicked() {
+        setColors(COLOR_RANDOM)
+        drawMandelbrot()
+    }
+    btnRandom::registerScriptHandler(onBtnRandomClicked)
+
+    var btnBack = CCMenuItemImage::itemFromNormalImage(
+                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
+    btnBack::setPosition(m_width / 2 - 16, m_height / 2 - 16);
+    function onBtnBackClicked() {
+        zoomOut()
+    }
+    btnBack::registerScriptHandler(onBtnBackClicked)
+
+    var btnHome = CCMenuItemImage::itemFromNormalImage(
+                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
+    btnHome::setPosition(m_width / 2 - 16, -m_height / 2 + 16);
+    function onBtnHomeClicked() {
+        m_steps = INIT_STEPS
+        drawMandelbrot(true)
+    }
+    btnHome::registerScriptHandler(onBtnHomeClicked)
+
+    var btnStepsUp = CCMenuItemImage::itemFromNormalImage(
+                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
+    btnStepsUp::setPosition(0, m_height / 2 - 16);
+    function onBtnStepsUpClicked() {
+        increaseSteps(INCREMENT_STEPS)
+    }
+    btnStepsUp::registerScriptHandler(onBtnStepsUpClicked)
+
+    var btnStepsDown = CCMenuItemImage::itemFromNormalImage(
+                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
+    btnStepsDown::setPosition(0, -m_height / 2 + 16);
+    function onBtnStepsDownClicked() {
+        increaseSteps(-INCREMENT_STEPS)
+    }
+    btnStepsDown::registerScriptHandler(onBtnStepsDownClicked)
+
+    var menu = CCMenu::menuWithItem(btnPalette);
+	menu::setPosition(m_width / 2, m_height / 2);
+    menu::addChild(btnRandom, 2);
+    menu::addChild(btnBack, 3);
+    menu::addChild(btnHome, 4);
+    menu::addChild(btnStepsUp, 5);
+    menu::addChild(btnStepsDown, 6);
+
+	scene::addChild(menu, 2);
+
+    //--------------------------------------------------------------------------
+    // Touch events handler
+    var layer = CCLayer::node();
+    scene::addChild(layer);
+
+    function onTouch(eventType, x, y) {
+        if (eventType == global.CCTOUCHBEGAN) {
+            return onTouchBegan(x, y)
+        }
+    }
+
+    layer::registerScriptTouchHandler(onTouch)
+    layer::setIsTouchEnabled(true)
+
+    //--------------------------------------------------------------------------
+    // Initialize color data
+    initializeColorData()
+    setColors(COLOR_PALETTE)
+
+    // Draw Mandelbrot fractal in default zone
+    drawMandelbrot(true)
+}
+
+init();
