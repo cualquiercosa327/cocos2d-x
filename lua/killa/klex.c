@@ -209,7 +209,11 @@ static void buffreplace (killa_LexState *ls, char from, char to) {
 
 
 #if !defined(getlocaledecpoint)
+#ifdef NDK_ANDROID
+#define getlocaledecpoint()	'.'
+#else
 #define getlocaledecpoint()	(localeconv()->decimal_point[0])
+#endif
 #endif
 
 

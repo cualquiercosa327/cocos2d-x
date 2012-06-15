@@ -1,7 +1,7 @@
 #!/bin/bash
 # set params
-NDK_ROOT_LOCAL=/cygdrive/d/programe/android/ndk/android-ndk-r7b
-COCOS2DX_ROOT_LOCAL=/cygdrive/e/cocos2d-x
+NDK_ROOT_LOCAL=/cygdrive/d/android-ndk-r7c
+COCOS2DX_ROOT_LOCAL=/cygdrive/f/dvx/cocos2d-x
 
 buildexternalsfromsource=
 

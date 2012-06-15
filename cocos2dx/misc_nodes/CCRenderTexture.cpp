@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "CCTextureCache.h"
 #include "CCFileUtils.h"
 #include "CCGL.h"
-#include "CCDrawingPrimitives.h"
 
 namespace cocos2d { 
 
@@ -451,16 +450,6 @@ CCData * CCRenderTexture::getUIImageAsDataFromBuffer(int format)
 	return pData;
 }
 
-void CCRenderTexture::setPointSize(float size)
-{
-	glPointSize(size);
-}
-
-void CCRenderTexture::setColor(float r, float g, float b, float a)
-{
-	glColor4f(r, g, b, a);
-}
-
 void CCRenderTexture::setLineWidth(float width)
 {
 	if (width <= 1.0f)
@@ -473,44 +462,6 @@ void CCRenderTexture::setLineWidth(float width)
 	    glDisable(GL_LINE_SMOOTH);
     }
 	glLineWidth(width);
-}
-
-void CCRenderTexture::drawPoint(float x, float y, float r, float g, float b, float a)
-{
-	glColor4f(r, g, b, a);
-	ccDrawPoint(CCPointMake(x, y));
-}
-
-void CCRenderTexture::drawLine(float x0, float y0, float x1, float y1)
-{
-    ccDrawLine(CCPointMake(x0, y0), CCPointMake(x1, y1));
-}
-
-void CCRenderTexture::drawCircle(float x, float y, float radius, int segments, float angle, bool fill)
-{
-    ccDrawCircle(CCPointMake(x, y), radius, angle, segments, false, fill);
-}
-
-void CCRenderTexture::drawQuadBezier(float x0, float y0, float x1, float y1, float x2, float y2, int segments)
-{
-    ccDrawQuadBezier(CCPointMake(x0, y0), CCPointMake(x1, y1), CCPointMake(x2, y2), segments);
-}
-
-void CCRenderTexture::drawCubicBezier(float x0, float y0, float x1, float y1, float x2, float y2,  float x3, float y3, int segments)
-{
-    ccDrawCubicBezier(CCPointMake(x0, y0), CCPointMake(x1, y1), CCPointMake(x2, y2), CCPointMake(x3, y3), segments);
-}
-
-void CCRenderTexture::drawTriangle(float x0, float y0, float x1, float y1, float x2, float y2, bool fill)
-{
-	CCPoint vertices[] = { CCPointMake(x0, y0), CCPointMake(x1, y1), CCPointMake(x2, y2) };
-	ccDrawPoly(vertices, 3, true, fill);
-}
-
-void CCRenderTexture::drawRectangle(float x, float y, float width, float height, bool fill)
-{
-	CCPoint vertices[] = { CCPointMake(x, y), CCPointMake(x+width, y), CCPointMake(x+width, y+height), CCPointMake(x, y+height) };
-	ccDrawPoly(vertices, 4, true, fill);
 }
 
 } // namespace cocos2d

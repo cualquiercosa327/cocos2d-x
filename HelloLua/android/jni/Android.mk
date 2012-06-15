@@ -6,6 +6,8 @@ LOCAL_MODULE := game_shared
 
 LOCAL_MODULE_FILENAME := libgame
 
+LOCAL_CFLAGS    := -DKILLA
+
 LOCAL_SRC_FILES := helloworld/main.cpp \
                    ../../Classes/AppDelegate.cpp \
                    ../../../lua/cocos2dx_support/CCLuaEngine.cpp \

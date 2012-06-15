@@ -108,7 +108,11 @@ bool AppDelegate::applicationDidFinishLaunching()
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
 	unsigned long size;
-	char *pFileContent = (char*)CCFileUtils::getFileData("hello.lua", "r", &size);
+#ifdef KILLA
+	char *pFileContent = (char*)CCFileUtils::getFileData("boot.kia", "r", &size);
+#else
+	char *pFileContent = (char*)CCFileUtils::getFileData("boot.lua", "r", &size);
+#endif
 
 	if (pFileContent)
 	{
