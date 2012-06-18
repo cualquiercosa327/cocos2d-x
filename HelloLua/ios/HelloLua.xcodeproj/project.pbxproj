@@ -11,22 +11,47 @@
 		506EDBA5102F4C9F00A389B3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 506EDBA4102F4C9F00A389B3 /* AVFoundation.framework */; };
 		7881584B14ECAE05007E8917 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7881584A14ECAE05007E8917 /* Icon.png */; };
 		7881584D14ECAE0D007E8917 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 7881584C14ECAE0D007E8917 /* Default.png */; };
-		78947C6D14EBB9B100DBD5A6 /* background.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 78947C5E14EBB9B000DBD5A6 /* background.mp3 */; };
-		78947C6E14EBB9B100DBD5A6 /* crop.png in Resources */ = {isa = PBXBuildFile; fileRef = 78947C5F14EBB9B000DBD5A6 /* crop.png */; };
-		78947C7014EBB9B100DBD5A6 /* dog.png in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6114EBB9B000DBD5A6 /* dog.png */; };
-		78947C7114EBB9B100DBD5A6 /* effect1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6214EBB9B000DBD5A6 /* effect1.wav */; };
-		78947C7214EBB9B100DBD5A6 /* farm.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6314EBB9B000DBD5A6 /* farm.jpg */; };
-		78947C7414EBB9B100DBD5A6 /* hello.lua in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6614EBB9B000DBD5A6 /* hello.lua */; };
-		78947C7514EBB9B100DBD5A6 /* hello2.lua in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6714EBB9B000DBD5A6 /* hello2.lua */; };
-		78947C7714EBB9B100DBD5A6 /* land.png in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6914EBB9B000DBD5A6 /* land.png */; };
-		78947C7814EBB9B100DBD5A6 /* menu1.png in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6A14EBB9B000DBD5A6 /* menu1.png */; };
-		78947C7914EBB9B100DBD5A6 /* menu2.png in Resources */ = {isa = PBXBuildFile; fileRef = 78947C6B14EBB9B000DBD5A6 /* menu2.png */; };
 		78947C7F14EBBA4700DBD5A6 /* CCNotificationCenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78947C7D14EBBA4700DBD5A6 /* CCNotificationCenter.cpp */; };
 		78947C8B14EBBB0300DBD5A6 /* CDAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 78947C8214EBBB0300DBD5A6 /* CDAudioManager.m */; };
 		78947C8C14EBBB0300DBD5A6 /* CDOpenALSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 78947C8514EBBB0300DBD5A6 /* CDOpenALSupport.m */; };
 		78947C8D14EBBB0300DBD5A6 /* CocosDenshion.m in Sources */ = {isa = PBXBuildFile; fileRef = 78947C8714EBBB0300DBD5A6 /* CocosDenshion.m */; };
 		78947C8E14EBBB0300DBD5A6 /* SimpleAudioEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 78947C8814EBBB0300DBD5A6 /* SimpleAudioEngine.mm */; };
 		78947C8F14EBBB0300DBD5A6 /* SimpleAudioEngine_objc.m in Sources */ = {isa = PBXBuildFile; fileRef = 78947C8A14EBBB0300DBD5A6 /* SimpleAudioEngine_objc.m */; };
+		8BD241CE158FB02000D2E410 /* tetris in Resources */ = {isa = PBXBuildFile; fileRef = 8BD241A7158FB02000D2E410 /* tetris */; };
+		8BD241CF158FB02000D2E410 /* mandelbrot in Resources */ = {isa = PBXBuildFile; fileRef = 8BD241B6158FB02000D2E410 /* mandelbrot */; };
+		8BD241D0158FB02000D2E410 /* hello in Resources */ = {isa = PBXBuildFile; fileRef = 8BD241BF158FB02000D2E410 /* hello */; };
+		8BD2423A158FB20300D2E410 /* kapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD241FE158FB20300D2E410 /* kapi.c */; };
+		8BD2423B158FB20300D2E410 /* kauxlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24200158FB20300D2E410 /* kauxlib.c */; };
+		8BD2423C158FB20300D2E410 /* kbaselib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24202158FB20300D2E410 /* kbaselib.c */; };
+		8BD2423D158FB20300D2E410 /* kbitlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24203158FB20300D2E410 /* kbitlib.c */; };
+		8BD2423E158FB20300D2E410 /* kcode.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24204158FB20300D2E410 /* kcode.c */; };
+		8BD2423F158FB20300D2E410 /* kcorolib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24206158FB20300D2E410 /* kcorolib.c */; };
+		8BD24240158FB20300D2E410 /* kctype.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24207158FB20300D2E410 /* kctype.c */; };
+		8BD24241158FB20300D2E410 /* kdblib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24209158FB20300D2E410 /* kdblib.c */; };
+		8BD24242158FB20300D2E410 /* kdebug.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2420A158FB20300D2E410 /* kdebug.c */; };
+		8BD24243158FB20300D2E410 /* kdo.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2420C158FB20300D2E410 /* kdo.c */; };
+		8BD24244158FB20300D2E410 /* kdump.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2420E158FB20300D2E410 /* kdump.c */; };
+		8BD24245158FB20300D2E410 /* kfunc.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2420F158FB20300D2E410 /* kfunc.c */; };
+		8BD24246158FB20300D2E410 /* kgc.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24211158FB20300D2E410 /* kgc.c */; };
+		8BD24249158FB20300D2E410 /* kinit.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24219158FB20300D2E410 /* kinit.c */; };
+		8BD2424A158FB20300D2E410 /* kiolib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2421A158FB20300D2E410 /* kiolib.c */; };
+		8BD2424B158FB20300D2E410 /* klex.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2421B158FB20300D2E410 /* klex.c */; };
+		8BD2424C158FB20300D2E410 /* kmathlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2421F158FB20300D2E410 /* kmathlib.c */; };
+		8BD2424D158FB20300D2E410 /* kmem.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24220158FB20300D2E410 /* kmem.c */; };
+		8BD2424E158FB20300D2E410 /* koadlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24222158FB20300D2E410 /* koadlib.c */; };
+		8BD2424F158FB20300D2E410 /* kobject.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24223158FB20300D2E410 /* kobject.c */; };
+		8BD24250158FB20300D2E410 /* kopcodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24225158FB20300D2E410 /* kopcodes.c */; };
+		8BD24251158FB20300D2E410 /* koslib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24227158FB20300D2E410 /* koslib.c */; };
+		8BD24252158FB20300D2E410 /* kparser.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24228158FB20300D2E410 /* kparser.c */; };
+		8BD24253158FB20300D2E410 /* kstate.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2422A158FB20300D2E410 /* kstate.c */; };
+		8BD24254158FB20300D2E410 /* kstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2422C158FB20300D2E410 /* kstring.c */; };
+		8BD24255158FB20300D2E410 /* kstrlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2422E158FB20300D2E410 /* kstrlib.c */; };
+		8BD24256158FB20300D2E410 /* ktable.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD2422F158FB20300D2E410 /* ktable.c */; };
+		8BD24257158FB20300D2E410 /* ktablib.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24231158FB20300D2E410 /* ktablib.c */; };
+		8BD24258158FB20300D2E410 /* ktm.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24232158FB20300D2E410 /* ktm.c */; };
+		8BD24259158FB20300D2E410 /* kundump.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24234158FB20300D2E410 /* kundump.c */; };
+		8BD2425A158FB20300D2E410 /* kvm.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24236158FB20300D2E410 /* kvm.c */; };
+		8BD2425B158FB20300D2E410 /* kzio.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BD24238158FB20300D2E410 /* kzio.c */; };
 		BF82F41713A864D700616D55 /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF82F41513A864D700616D55 /* AppDelegate.cpp */; };
 		BF82F42113A8652A00616D55 /* AppController.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF82F41F13A8652A00616D55 /* AppController.mm */; };
 		BF82F42213A8652A00616D55 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BF82F42013A8652A00616D55 /* main.m */; };
@@ -188,16 +213,6 @@
 		506EDBA4102F4C9F00A389B3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		7881584A14ECAE05007E8917 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../ios/Icon.png; sourceTree = "<group>"; };
 		7881584C14ECAE0D007E8917 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = ../ios/Default.png; sourceTree = "<group>"; };
-		78947C5E14EBB9B000DBD5A6 /* background.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = background.mp3; sourceTree = "<group>"; };
-		78947C5F14EBB9B000DBD5A6 /* crop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = crop.png; sourceTree = "<group>"; };
-		78947C6114EBB9B000DBD5A6 /* dog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dog.png; sourceTree = "<group>"; };
-		78947C6214EBB9B000DBD5A6 /* effect1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = effect1.wav; sourceTree = "<group>"; };
-		78947C6314EBB9B000DBD5A6 /* farm.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = farm.jpg; sourceTree = "<group>"; };
-		78947C6614EBB9B000DBD5A6 /* hello.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hello.lua; sourceTree = "<group>"; };
-		78947C6714EBB9B000DBD5A6 /* hello2.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hello2.lua; sourceTree = "<group>"; };
-		78947C6914EBB9B000DBD5A6 /* land.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = land.png; sourceTree = "<group>"; };
-		78947C6A14EBB9B000DBD5A6 /* menu1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu1.png; sourceTree = "<group>"; };
-		78947C6B14EBB9B000DBD5A6 /* menu2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu2.png; sourceTree = "<group>"; };
 		78947C7D14EBBA4700DBD5A6 /* CCNotificationCenter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCNotificationCenter.cpp; sourceTree = "<group>"; };
 		78947C7E14EBBA4700DBD5A6 /* CCNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCNotificationCenter.h; sourceTree = "<group>"; };
 		78947C8114EBBB0300DBD5A6 /* CDAudioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDAudioManager.h; sourceTree = "<group>"; };
@@ -210,6 +225,67 @@
 		78947C8814EBBB0300DBD5A6 /* SimpleAudioEngine.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SimpleAudioEngine.mm; sourceTree = "<group>"; };
 		78947C8914EBBB0300DBD5A6 /* SimpleAudioEngine_objc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleAudioEngine_objc.h; sourceTree = "<group>"; };
 		78947C8A14EBBB0300DBD5A6 /* SimpleAudioEngine_objc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleAudioEngine_objc.m; sourceTree = "<group>"; };
+		8BD241A7158FB02000D2E410 /* tetris */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tetris; sourceTree = "<group>"; };
+		8BD241B6158FB02000D2E410 /* mandelbrot */ = {isa = PBXFileReference; lastKnownFileType = folder; path = mandelbrot; sourceTree = "<group>"; };
+		8BD241BF158FB02000D2E410 /* hello */ = {isa = PBXFileReference; lastKnownFileType = folder; path = hello; sourceTree = "<group>"; };
+		8BD241FE158FB20300D2E410 /* kapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kapi.c; sourceTree = "<group>"; };
+		8BD241FF158FB20300D2E410 /* kapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kapi.h; sourceTree = "<group>"; };
+		8BD24200158FB20300D2E410 /* kauxlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kauxlib.c; sourceTree = "<group>"; };
+		8BD24201158FB20300D2E410 /* kauxlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kauxlib.h; sourceTree = "<group>"; };
+		8BD24202158FB20300D2E410 /* kbaselib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kbaselib.c; sourceTree = "<group>"; };
+		8BD24203158FB20300D2E410 /* kbitlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kbitlib.c; sourceTree = "<group>"; };
+		8BD24204158FB20300D2E410 /* kcode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kcode.c; sourceTree = "<group>"; };
+		8BD24205158FB20300D2E410 /* kcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kcode.h; sourceTree = "<group>"; };
+		8BD24206158FB20300D2E410 /* kcorolib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kcorolib.c; sourceTree = "<group>"; };
+		8BD24207158FB20300D2E410 /* kctype.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kctype.c; sourceTree = "<group>"; };
+		8BD24208158FB20300D2E410 /* kctype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kctype.h; sourceTree = "<group>"; };
+		8BD24209158FB20300D2E410 /* kdblib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kdblib.c; sourceTree = "<group>"; };
+		8BD2420A158FB20300D2E410 /* kdebug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kdebug.c; sourceTree = "<group>"; };
+		8BD2420B158FB20300D2E410 /* kdebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kdebug.h; sourceTree = "<group>"; };
+		8BD2420C158FB20300D2E410 /* kdo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kdo.c; sourceTree = "<group>"; };
+		8BD2420D158FB20300D2E410 /* kdo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kdo.h; sourceTree = "<group>"; };
+		8BD2420E158FB20300D2E410 /* kdump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kdump.c; sourceTree = "<group>"; };
+		8BD2420F158FB20300D2E410 /* kfunc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kfunc.c; sourceTree = "<group>"; };
+		8BD24210158FB20300D2E410 /* kfunc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kfunc.h; sourceTree = "<group>"; };
+		8BD24211158FB20300D2E410 /* kgc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kgc.c; sourceTree = "<group>"; };
+		8BD24212158FB20300D2E410 /* kgc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kgc.h; sourceTree = "<group>"; };
+		8BD24214158FB20300D2E410 /* killa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = killa.h; sourceTree = "<group>"; };
+		8BD24215158FB20300D2E410 /* killa.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = killa.hpp; sourceTree = "<group>"; };
+		8BD24217158FB20300D2E410 /* killaconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = killaconf.h; sourceTree = "<group>"; };
+		8BD24218158FB20300D2E410 /* killalib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = killalib.h; sourceTree = "<group>"; };
+		8BD24219158FB20300D2E410 /* kinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kinit.c; sourceTree = "<group>"; };
+		8BD2421A158FB20300D2E410 /* kiolib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kiolib.c; sourceTree = "<group>"; };
+		8BD2421B158FB20300D2E410 /* klex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = klex.c; sourceTree = "<group>"; };
+		8BD2421C158FB20300D2E410 /* klex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = klex.h; sourceTree = "<group>"; };
+		8BD2421D158FB20300D2E410 /* klimits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = klimits.h; sourceTree = "<group>"; };
+		8BD2421E158FB20300D2E410 /* klua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = klua.h; sourceTree = "<group>"; };
+		8BD2421F158FB20300D2E410 /* kmathlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmathlib.c; sourceTree = "<group>"; };
+		8BD24220158FB20300D2E410 /* kmem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kmem.c; sourceTree = "<group>"; };
+		8BD24221158FB20300D2E410 /* kmem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kmem.h; sourceTree = "<group>"; };
+		8BD24222158FB20300D2E410 /* koadlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = koadlib.c; sourceTree = "<group>"; };
+		8BD24223158FB20300D2E410 /* kobject.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kobject.c; sourceTree = "<group>"; };
+		8BD24224158FB20300D2E410 /* kobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kobject.h; sourceTree = "<group>"; };
+		8BD24225158FB20300D2E410 /* kopcodes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kopcodes.c; sourceTree = "<group>"; };
+		8BD24226158FB20300D2E410 /* kopcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kopcodes.h; sourceTree = "<group>"; };
+		8BD24227158FB20300D2E410 /* koslib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = koslib.c; sourceTree = "<group>"; };
+		8BD24228158FB20300D2E410 /* kparser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kparser.c; sourceTree = "<group>"; };
+		8BD24229158FB20300D2E410 /* kparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kparser.h; sourceTree = "<group>"; };
+		8BD2422A158FB20300D2E410 /* kstate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kstate.c; sourceTree = "<group>"; };
+		8BD2422B158FB20300D2E410 /* kstate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kstate.h; sourceTree = "<group>"; };
+		8BD2422C158FB20300D2E410 /* kstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kstring.c; sourceTree = "<group>"; };
+		8BD2422D158FB20300D2E410 /* kstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kstring.h; sourceTree = "<group>"; };
+		8BD2422E158FB20300D2E410 /* kstrlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kstrlib.c; sourceTree = "<group>"; };
+		8BD2422F158FB20300D2E410 /* ktable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ktable.c; sourceTree = "<group>"; };
+		8BD24230158FB20300D2E410 /* ktable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ktable.h; sourceTree = "<group>"; };
+		8BD24231158FB20300D2E410 /* ktablib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ktablib.c; sourceTree = "<group>"; };
+		8BD24232158FB20300D2E410 /* ktm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ktm.c; sourceTree = "<group>"; };
+		8BD24233158FB20300D2E410 /* ktm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ktm.h; sourceTree = "<group>"; };
+		8BD24234158FB20300D2E410 /* kundump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kundump.c; sourceTree = "<group>"; };
+		8BD24235158FB20300D2E410 /* kundump.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kundump.h; sourceTree = "<group>"; };
+		8BD24236158FB20300D2E410 /* kvm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kvm.c; sourceTree = "<group>"; };
+		8BD24237158FB20300D2E410 /* kvm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kvm.h; sourceTree = "<group>"; };
+		8BD24238158FB20300D2E410 /* kzio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = kzio.c; sourceTree = "<group>"; };
+		8BD24239158FB20300D2E410 /* kzio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = kzio.h; sourceTree = "<group>"; };
 		BF82F41513A864D700616D55 /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AppDelegate.cpp; path = ../Classes/AppDelegate.cpp; sourceTree = SOURCE_ROOT; };
 		BF82F41613A864D700616D55 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = ../Classes/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		BF82F41E13A8652A00616D55 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -615,6 +691,7 @@
 		506EDAA3102F461B00A389B3 /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				8BD241FD158FB20300D2E410 /* killa */,
 				F4807DE014E3CB660021A5F8 /* cocos2dx */,
 				F480871B14E3CB6A0021A5F8 /* CocosDenshion */,
 				F48087DF14E3CB6A0021A5F8 /* lua */,
@@ -625,18 +702,11 @@
 		78947C5C14EBB9B000DBD5A6 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8BD241A7158FB02000D2E410 /* tetris */,
+				8BD241B6158FB02000D2E410 /* mandelbrot */,
+				8BD241BF158FB02000D2E410 /* hello */,
 				7881584C14ECAE0D007E8917 /* Default.png */,
 				7881584A14ECAE05007E8917 /* Icon.png */,
-				78947C5E14EBB9B000DBD5A6 /* background.mp3 */,
-				78947C5F14EBB9B000DBD5A6 /* crop.png */,
-				78947C6114EBB9B000DBD5A6 /* dog.png */,
-				78947C6214EBB9B000DBD5A6 /* effect1.wav */,
-				78947C6314EBB9B000DBD5A6 /* farm.jpg */,
-				78947C6614EBB9B000DBD5A6 /* hello.lua */,
-				78947C6714EBB9B000DBD5A6 /* hello2.lua */,
-				78947C6914EBB9B000DBD5A6 /* land.png */,
-				78947C6A14EBB9B000DBD5A6 /* menu1.png */,
-				78947C6B14EBB9B000DBD5A6 /* menu2.png */,
 			);
 			name = Resources;
 			path = ../Resources;
@@ -667,6 +737,72 @@
 			);
 			path = ios;
 			sourceTree = "<group>";
+		};
+		8BD241FD158FB20300D2E410 /* killa */ = {
+			isa = PBXGroup;
+			children = (
+				8BD241FE158FB20300D2E410 /* kapi.c */,
+				8BD241FF158FB20300D2E410 /* kapi.h */,
+				8BD24200158FB20300D2E410 /* kauxlib.c */,
+				8BD24201158FB20300D2E410 /* kauxlib.h */,
+				8BD24202158FB20300D2E410 /* kbaselib.c */,
+				8BD24203158FB20300D2E410 /* kbitlib.c */,
+				8BD24204158FB20300D2E410 /* kcode.c */,
+				8BD24205158FB20300D2E410 /* kcode.h */,
+				8BD24206158FB20300D2E410 /* kcorolib.c */,
+				8BD24207158FB20300D2E410 /* kctype.c */,
+				8BD24208158FB20300D2E410 /* kctype.h */,
+				8BD24209158FB20300D2E410 /* kdblib.c */,
+				8BD2420A158FB20300D2E410 /* kdebug.c */,
+				8BD2420B158FB20300D2E410 /* kdebug.h */,
+				8BD2420C158FB20300D2E410 /* kdo.c */,
+				8BD2420D158FB20300D2E410 /* kdo.h */,
+				8BD2420E158FB20300D2E410 /* kdump.c */,
+				8BD2420F158FB20300D2E410 /* kfunc.c */,
+				8BD24210158FB20300D2E410 /* kfunc.h */,
+				8BD24211158FB20300D2E410 /* kgc.c */,
+				8BD24212158FB20300D2E410 /* kgc.h */,
+				8BD24214158FB20300D2E410 /* killa.h */,
+				8BD24215158FB20300D2E410 /* killa.hpp */,
+				8BD24217158FB20300D2E410 /* killaconf.h */,
+				8BD24218158FB20300D2E410 /* killalib.h */,
+				8BD24219158FB20300D2E410 /* kinit.c */,
+				8BD2421A158FB20300D2E410 /* kiolib.c */,
+				8BD2421B158FB20300D2E410 /* klex.c */,
+				8BD2421C158FB20300D2E410 /* klex.h */,
+				8BD2421D158FB20300D2E410 /* klimits.h */,
+				8BD2421E158FB20300D2E410 /* klua.h */,
+				8BD2421F158FB20300D2E410 /* kmathlib.c */,
+				8BD24220158FB20300D2E410 /* kmem.c */,
+				8BD24221158FB20300D2E410 /* kmem.h */,
+				8BD24222158FB20300D2E410 /* koadlib.c */,
+				8BD24223158FB20300D2E410 /* kobject.c */,
+				8BD24224158FB20300D2E410 /* kobject.h */,
+				8BD24225158FB20300D2E410 /* kopcodes.c */,
+				8BD24226158FB20300D2E410 /* kopcodes.h */,
+				8BD24227158FB20300D2E410 /* koslib.c */,
+				8BD24228158FB20300D2E410 /* kparser.c */,
+				8BD24229158FB20300D2E410 /* kparser.h */,
+				8BD2422A158FB20300D2E410 /* kstate.c */,
+				8BD2422B158FB20300D2E410 /* kstate.h */,
+				8BD2422C158FB20300D2E410 /* kstring.c */,
+				8BD2422D158FB20300D2E410 /* kstring.h */,
+				8BD2422E158FB20300D2E410 /* kstrlib.c */,
+				8BD2422F158FB20300D2E410 /* ktable.c */,
+				8BD24230158FB20300D2E410 /* ktable.h */,
+				8BD24231158FB20300D2E410 /* ktablib.c */,
+				8BD24232158FB20300D2E410 /* ktm.c */,
+				8BD24233158FB20300D2E410 /* ktm.h */,
+				8BD24234158FB20300D2E410 /* kundump.c */,
+				8BD24235158FB20300D2E410 /* kundump.h */,
+				8BD24236158FB20300D2E410 /* kvm.c */,
+				8BD24237158FB20300D2E410 /* kvm.h */,
+				8BD24238158FB20300D2E410 /* kzio.c */,
+				8BD24239158FB20300D2E410 /* kzio.h */,
+			);
+			name = killa;
+			path = ../../lua/killa;
+			sourceTree = SOURCE_ROOT;
 		};
 		BF82F41413A864B000616D55 /* Classes */ = {
 			isa = PBXGroup;
@@ -1312,18 +1448,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				78947C6D14EBB9B100DBD5A6 /* background.mp3 in Resources */,
-				78947C6E14EBB9B100DBD5A6 /* crop.png in Resources */,
-				78947C7014EBB9B100DBD5A6 /* dog.png in Resources */,
-				78947C7114EBB9B100DBD5A6 /* effect1.wav in Resources */,
-				78947C7214EBB9B100DBD5A6 /* farm.jpg in Resources */,
-				78947C7414EBB9B100DBD5A6 /* hello.lua in Resources */,
-				78947C7514EBB9B100DBD5A6 /* hello2.lua in Resources */,
-				78947C7714EBB9B100DBD5A6 /* land.png in Resources */,
-				78947C7814EBB9B100DBD5A6 /* menu1.png in Resources */,
-				78947C7914EBB9B100DBD5A6 /* menu2.png in Resources */,
 				7881584B14ECAE05007E8917 /* Icon.png in Resources */,
 				7881584D14ECAE0D007E8917 /* Default.png in Resources */,
+				8BD241CE158FB02000D2E410 /* tetris in Resources */,
+				8BD241CF158FB02000D2E410 /* mandelbrot in Resources */,
+				8BD241D0158FB02000D2E410 /* hello in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1485,6 +1614,38 @@
 				78947C8D14EBBB0300DBD5A6 /* CocosDenshion.m in Sources */,
 				78947C8E14EBBB0300DBD5A6 /* SimpleAudioEngine.mm in Sources */,
 				78947C8F14EBBB0300DBD5A6 /* SimpleAudioEngine_objc.m in Sources */,
+				8BD2423A158FB20300D2E410 /* kapi.c in Sources */,
+				8BD2423B158FB20300D2E410 /* kauxlib.c in Sources */,
+				8BD2423C158FB20300D2E410 /* kbaselib.c in Sources */,
+				8BD2423D158FB20300D2E410 /* kbitlib.c in Sources */,
+				8BD2423E158FB20300D2E410 /* kcode.c in Sources */,
+				8BD2423F158FB20300D2E410 /* kcorolib.c in Sources */,
+				8BD24240158FB20300D2E410 /* kctype.c in Sources */,
+				8BD24241158FB20300D2E410 /* kdblib.c in Sources */,
+				8BD24242158FB20300D2E410 /* kdebug.c in Sources */,
+				8BD24243158FB20300D2E410 /* kdo.c in Sources */,
+				8BD24244158FB20300D2E410 /* kdump.c in Sources */,
+				8BD24245158FB20300D2E410 /* kfunc.c in Sources */,
+				8BD24246158FB20300D2E410 /* kgc.c in Sources */,
+				8BD24249158FB20300D2E410 /* kinit.c in Sources */,
+				8BD2424A158FB20300D2E410 /* kiolib.c in Sources */,
+				8BD2424B158FB20300D2E410 /* klex.c in Sources */,
+				8BD2424C158FB20300D2E410 /* kmathlib.c in Sources */,
+				8BD2424D158FB20300D2E410 /* kmem.c in Sources */,
+				8BD2424E158FB20300D2E410 /* koadlib.c in Sources */,
+				8BD2424F158FB20300D2E410 /* kobject.c in Sources */,
+				8BD24250158FB20300D2E410 /* kopcodes.c in Sources */,
+				8BD24251158FB20300D2E410 /* koslib.c in Sources */,
+				8BD24252158FB20300D2E410 /* kparser.c in Sources */,
+				8BD24253158FB20300D2E410 /* kstate.c in Sources */,
+				8BD24254158FB20300D2E410 /* kstring.c in Sources */,
+				8BD24255158FB20300D2E410 /* kstrlib.c in Sources */,
+				8BD24256158FB20300D2E410 /* ktable.c in Sources */,
+				8BD24257158FB20300D2E410 /* ktablib.c in Sources */,
+				8BD24258158FB20300D2E410 /* ktm.c in Sources */,
+				8BD24259158FB20300D2E410 /* kundump.c in Sources */,
+				8BD2425A158FB20300D2E410 /* kvm.c in Sources */,
+				8BD2425B158FB20300D2E410 /* kzio.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1494,7 +1655,7 @@
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1506,6 +1667,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = HelloLua_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					KILLA_COMPAT_ALL,
+					KILLA,
 					USE_FILE32API,
 					TARGET_OS_IPHONE,
 				);
@@ -1517,12 +1680,13 @@
 					"\"$(SDKROOT)/usr/include/libxml2/\"",
 					"\"$(SRCROOT)/../../cocos2dx/\"",
 					"\"$(SRCROOT)/../../lua/tolua\"",
+					"\"$(SRCROOT)/../../lua/killa\"",
 					"\"$(SRCROOT)/../../lua/src\"",
 					"$(SRCROOT)/../../lua/cocos2dx_support",
 					"$(SRCROOT)/../../lua/CocosDenshion_support",
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../cocos2dx/platform/third_party/ios/libraries\"",
@@ -1538,6 +1702,7 @@
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = NO;
+				VALID_ARCHS = "armv6 armv7";
 				WARNING_CFLAGS = "";
 			};
 			name = Debug;
@@ -1545,7 +1710,7 @@
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -1557,6 +1722,8 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					USE_FILE32API,
 					TARGET_OS_IPHONE,
+					KILLA,
+					KILLA_COMPAT_ALL,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
@@ -1568,9 +1735,10 @@
 					"\"$(SRCROOT)/../../lua/tolua\"",
 					"\"$(SRCROOT)/../../lua/src\"",
 					"$(SRCROOT)/../../lua/cocos2dx_support",
+					"\"$(SRCROOT)/../../lua/killa\"",
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../cocos2dx/platform/third_party/ios/libraries\"",
@@ -1586,6 +1754,7 @@
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = NO;
+				VALID_ARCHS = "armv6 armv7";
 				WARNING_CFLAGS = "";
 			};
 			name = Release;
