@@ -180,6 +180,7 @@ var Game = {
     m_nextBlock:    NULL;  // next tetromino
 
     m_stateChanged: false; // true if game state has changed
+    m_stateMoved:   false; // true if falling tetromino has moved
     m_errorCode:    0;     // stores current error code
     m_isPaused:     false; // true if the game is over
     m_isOver:       false; // true if the game is over
@@ -202,11 +203,17 @@ var Game = {
 // The platform must call this method after processing a changed state.
 function Game::onChangeProcessed()   { this.m_stateChanged = false }
 
+// The platform must call this method after processing a tetramino move.
+function Game::onMoveProcessed()     { this.m_stateMoved = false; }
+
 // Return the cell at the specified position.
 function Game::getCell(column, row)  { return this.m_map[column][row] }
 
 // Return true if the game state has changed, false otherwise.
 function Game::hasChanged()          { return this.m_stateChanged }
+
+// Return true if the falling tetromino has moved, false otherwise.
+function Game::hasMoved()            { return this.m_stateMoved }
 
 // Return a reference to the game statistic data.
 function Game::stats()               { return this.m_stats }
@@ -345,6 +352,7 @@ function Game::start() {
 	this.m_events = this.Event.NONE
 	this.m_fallingDelay = INIT_DELAY_FALL
 	this.m_showShadow = true
+    this.m_stateChanged = true
 
 	// Initialize game statistics.
 	for each (var i = 0 to this.TETROMINO_TYPES - 1) {
@@ -598,6 +606,8 @@ function Game::moveTetromino(x, y) {
 
 				// Create next preview tetromino.
 				this::setTetromino(Platform::random() % this.TETROMINO_TYPES, this.m_nextBlock)
+
+                this.m_stateChanged = true
 			}
 		}
     }
@@ -634,7 +644,7 @@ function Game::update() {
 	if (this.m_isOver) {
 		if (isFlagSet(this.m_events, this.Event.RESTART)) {
 			this.m_isOver = false
-			this:start()
+			this::start()
 		}
     }
 	else {
@@ -689,12 +699,12 @@ function Game::update() {
 		else {
 			if (this.m_events != this.Event.NONE) {
 				if (isFlagSet(this.m_events, this.Event.SHOW_NEXT)) {
-					this.m_showPreview = ! this.m_showPreview
+					this.m_showPreview = !this.m_showPreview
 					this.m_stateChanged = true
 				}
 				if (isFlagSet(this.m_events, this.Event.SHOW_SHADOW)) {
-					this.m_showShadow = ! this.m_showShadow
-					this.m_stateChanged = true
+					this.m_showShadow = !this.m_showShadow
+					this.m_stateMoved = true
 				}
 				if (isFlagSet(this.m_events, this.Event.DROP)) {
 					this::dropTetromino()
@@ -738,7 +748,7 @@ function Game::onTetrominoMoved() {
         y += 1
     }
 	this.m_shadowGap = y - 1
-	this.m_stateChanged = true
+	this.m_stateMoved = true
 }
 
 // Process a key down event.

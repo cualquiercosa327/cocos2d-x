@@ -305,15 +305,24 @@ void CCLuaEngine::addLuaLoader(lua_CFunction func)
     lua_getglobal(m_state, "package");                     // package
     lua_getfield(m_state, -1, "loaders");                  // package, loaders
 
-    // insert loader into index 2
+    // insert loader as second element
     lua_pushcfunction(m_state, func);                      // package, loaders, func
+#if KILLA
+    int index = 1 + KILLA_BASE;
+    for (int i = lua_objlen(m_state, -2) + KILLA_BASE; i > index; --i)
+#else
     for (int i = lua_objlen(m_state, -2) + 1; i > 2; --i)
+#endif
     {
         lua_rawgeti(m_state, -2, i - 1);                   // package, loaders, func, function
                                                            // we call lua_rawgeti, so the loader table now is at -3
         lua_rawseti(m_state, -3, i);                       // package, loaders, func
     }
+#if KILLA
+    lua_rawseti(m_state, -2, index);                           // package, loaders
+#else
     lua_rawseti(m_state, -2, 2);                           // package, loaders
+#endif
 
     // set loaders into package
     lua_setfield(m_state, -2, "loaders");                  // package

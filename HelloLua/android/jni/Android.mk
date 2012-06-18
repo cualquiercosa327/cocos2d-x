@@ -6,7 +6,7 @@ LOCAL_MODULE := game_shared
 
 LOCAL_MODULE_FILENAME := libgame
 
-LOCAL_CFLAGS    := -DKILLA
+LOCAL_CFLAGS    := -DKILLA -DKILLA_COMPAT_ALL -DNDK_ANDROID
 
 LOCAL_SRC_FILES := helloworld/main.cpp \
                    ../../Classes/AppDelegate.cpp \

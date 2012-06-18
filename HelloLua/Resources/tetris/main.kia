@@ -29,7 +29,8 @@
 /*   OTHER DEALINGS IN THE SOFTWARE.                                          */
 /* -------------------------------------------------------------------------- */
 
+var ogles2 = false
 var game     = require('tetris/game')
-var platform = require('tetris/platform')
+var platform = require('tetris/platform' .. (ogles2)? 'OGLES2' : '') 
 
 game::init(platform)

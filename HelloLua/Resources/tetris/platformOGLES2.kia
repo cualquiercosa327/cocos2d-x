@@ -1,0 +1,407 @@
+/* ========================================================================== */
+/*   Platform implementation.                                                 */
+/*   We use a CCRenderTexture for rendering, because this requieres frame     */
+/*   buffers is guaranteed to work only in OpenGLES 2.0 devices.              */
+/*   Copyright (c) 2012 Laurens Rodriguez Oscanoa.                            */
+/* -------------------------------------------------------------------------- */
+
+// Local reference to game.
+var Game
+
+// Background size
+var BACKGROUND_WIDTH  = 480;
+var BACKGROUND_HEIGHT = 272;
+
+// Size of square tile
+var TILE_SIZE = 12;
+
+// Board up-left corner coordinates
+var BOARD_X = 180;
+var BOARD_Y = 4;
+
+// Preview tetromino position
+var PREVIEW_X = 112;
+var PREVIEW_Y = 210;
+
+// Score position and length on screen
+var SCORE_X      = 72;
+var SCORE_Y      = 64;
+var SCORE_LENGTH = 10;
+
+// Lines position and length on screen
+var LINES_X      = 108;
+var LINES_Y      = 46;
+var LINES_LENGTH = 5;
+
+// Level position and length on screen
+var LEVEL_X      = 108;
+var LEVEL_Y      = 28;
+var LEVEL_LENGTH = 5;
+
+// Tetromino subtotals position
+var TETROMINO_X   = 425;
+var TETROMINO_L_Y = 53;
+var TETROMINO_I_Y = 77;
+var TETROMINO_T_Y = 101;
+var TETROMINO_S_Y = 125;
+var TETROMINO_Z_Y = 149;
+var TETROMINO_O_Y = 173;
+var TETROMINO_J_Y = 197;
+
+// Size of subtotals
+var TETROMINO_LENGTH = 5;
+
+// Tetromino total position
+var PIECES_X      = 418;
+var PIECES_Y      = 221;
+var PIECES_LENGTH = 6;
+
+// Size of number
+var NUMBER_WIDTH  = 7;
+var NUMBER_HEIGHT = 9;
+
+// Touch zones limits
+var TX_1 = 160;
+var TX_2 = 320;
+
+var TY_DROP = 250;    
+var TY_DOWN = 70;    
+
+var TY_1 = 50;    
+var TY_2 = 270;    
+
+var NULL = 0
+var MUSIC_VOLUME = 0.25
+
+var Platform = {
+    // Sprite arrays.
+    m_tiles:   {};
+    m_numbers: {};
+    m_shadows: {};
+
+    // Sounds.
+    m_musicMute:  false;
+
+    m_elapsedTime: 0; // Used to store the time passed.
+    m_yOffset:     0; // Used to correct rendering positions.
+
+    // We draw the game state over this rendering target object.
+    m_canvas:   NULL;
+}
+
+// Logging messages
+function log(...) {
+    CCLuaLog(string.format(...))
+}
+
+function Platform::onTouchBegan(tx, ty) {
+    ty = 320 - ty
+    if (tx < TX_1) {
+        if (ty < TY_1) {
+            Game::onEventStart(Game.Event.SHOW_NEXT)
+        }
+        else if (ty < TY_2) {
+            Game::onEventStart(Game.Event.MOVE_LEFT)
+        }
+        else {
+            Game::onEventStart(Game.Event.RESTART)
+        }
+    }
+    else if (tx < TX_2) {
+        if (ty < TY_DOWN) {
+            Game::onEventStart(Game.Event.ROTATE_CW)
+        }
+        else if (ty > TY_DROP) {
+            Game::onEventStart(Game.Event.DROP)
+        }
+        else {
+            Game::onEventStart(Game.Event.MOVE_DOWN)
+        }
+    }
+    else {
+        if (ty < TY_1) {
+            Game::onEventStart(Game.Event.SHOW_SHADOW)
+        }
+        else if (ty < TY_2) {
+            Game::onEventStart(Game.Event.MOVE_RIGHT)
+        }
+        else {
+            Game::onEventStart(Game.Event.PAUSE)
+        }
+    }
+    log("onTouchBegant: %d %d", tx, ty)
+    return true // CCTOUCHBEGAN event must return true
+}
+
+function Platform::onTouchEnded() {
+    // Just cancel any continuos action by now
+    Game::onEventEnd(Game.Event.MOVE_LEFT)
+    Game::onEventEnd(Game.Event.MOVE_RIGHT)
+    Game::onEventEnd(Game.Event.MOVE_DOWN)
+    Game::onEventEnd(Game.Event.ROTATE_CW)
+    return false
+}
+
+function Platform::createGameLayer(scene) {
+
+    var gameLayer = CCLayer::node()
+
+    // Disable FPS label.
+    CCDirector::sharedDirector()::setDisplayFPS(false)
+
+    // Get game view size.
+    var size = CCDirector::sharedDirector()::getWinSize()
+
+    // Calculate offset for drawing. (the origin in cocos2d-x is the bottom-left
+    // corner and UI original postions were done for a 272x480 screen size).
+    this.m_yOffset = size.height - (size.height - BACKGROUND_HEIGHT) / 2
+
+    //--------------------------------------------------------------------------
+    // Add background image.
+    var background = CCSprite::spriteWithFile("tetris/back.png")
+
+	// Position the background on the center of the screen.
+    background::setPosition(size.width / 2, size.height / 2)
+
+	// Add the background as a child to this layer.
+    gameLayer::addChild(background)
+
+    //--------------------------------------------------------------------------
+    // Create a render texture to draw the game state.
+    this.m_canvas = CCRenderTexture::renderTextureWithWidthAndHeight(size.width, size.height)
+    this.m_canvas::setPosition(size.width/2, size.height/2)
+
+    // Note that the render texture is a cocos node, and contains a sprite of it's texture 
+    // for convience, so we can just parent it to the scene like any other cocos node.
+    scene::addChild(this.m_canvas, 1)
+
+    //--------------------------------------------------------------------------
+    // Create the sprites for drawing the tetrominoes.
+    for (var k = 0; k < Game.TETROMINO_TYPES + 1; k += 1) {
+        // Images for tiles have 2 extra pixels
+        this.m_tiles[k] = CCSprite::spriteWithFile("tetris/blocks.png", 
+                                                   CCRectMake((TILE_SIZE + 2) * k, 0, 
+                                                               TILE_SIZE + 2, TILE_SIZE + 2))
+        this.m_tiles[k]::retain()
+    }
+
+    //--------------------------------------------------------------------------
+    // Create the sprites for drawing the shadows.
+    for (var k = 0; k < Game.TETROMINO_TYPES + 1; k += 1) {
+        // Images for shadows have 2 pixels less
+        this.m_shadows[k] = CCSprite::spriteWithFile("tetris/blocks.png", 
+                                                     CCRectMake((TILE_SIZE  + 2) * k, TILE_SIZE + 2, 
+                                                                 TILE_SIZE - 2, TILE_SIZE - 2))
+        this.m_shadows[k]::retain()
+    }
+
+    //--------------------------------------------------------------------------
+    // Create the sprites for drawing the numbers.
+    for (var k = 0; k < Game.TETROMINO_TYPES + 1; k += 1) {
+        this.m_numbers[k] = {}
+        for (var i = 0; i < 10; i += 1) {
+            // Images for numbers have 1 extra pixel
+            this.m_numbers[k][i] = CCSprite::spriteWithFile("tetris/numbers.png", 
+                                                            CCRectMake((NUMBER_WIDTH + 1) * i, (NUMBER_HEIGHT  + 1) * k,
+                                                                        NUMBER_WIDTH + 1, NUMBER_HEIGHT + 1))
+            this.m_numbers[k][i]::retain()
+        }
+    }
+
+    //--------------------------------------------------------------------------
+	// Add a "close" icon to exit the game, it's an autorelease object.
+    var btnClose = CCMenuItemImage::itemFromNormalImage("tetris/close_normal.png", "tetris/close_selected.png")
+    btnClose::setPosition(-20, 20);
+
+    function menuCloseCallback() {
+        log("Close game")
+        CCDirector::sharedDirector()::finish()
+    }
+    btnClose::registerScriptHandler(menuCloseCallback)
+
+	// Create menu, it's an autorelease object.
+	var menuClose = CCMenu::menuWithItem(btnClose);
+	menuClose::setPosition(size.width, 0);
+	scene::addChild(menuClose, 1);
+
+    //--------------------------------------------------------------------------
+    // Touch events handler
+    function onTouch(eventType, x, y) {
+        if (eventType == global.CCTOUCHBEGAN) {
+            return this::onTouchBegan(x, y)
+        }
+        else if (eventType == global.CCTOUCHENDED) {
+            return this::onTouchEnded(x, y)
+        }
+    }
+
+    gameLayer::registerScriptTouchHandler(onTouch)
+    gameLayer::setIsTouchEnabled(true)
+    return gameLayer
+}
+
+// Initializes platform.
+function Platform::init(game) {
+    Game = game
+
+    // Initialize random generator
+    math.randomseed(os.time())
+
+    // Avoid memory leaks
+    collectgarbage("setpause", 100)
+    collectgarbage("setstepmul", 5000)
+
+    // Create game layer and run
+    var sceneGame = CCScene::node()
+    sceneGame::addChild(this::createGameLayer(sceneGame))
+    CCDirector::sharedDirector()::runWithScene(sceneGame)
+
+     // Load music.
+    SimpleAudioEngine::sharedEngine()::playBackgroundMusic("tetris/stc_theme_loop.mp3", true)
+    SimpleAudioEngine::sharedEngine()::preloadEffect("tetris/fx_line.wav");
+    SimpleAudioEngine::sharedEngine()::preloadEffect("tetris/fx_drop.wav");
+    this.m_musicMute = false
+
+    // Schedule game update.
+    function update(dt) {
+        // Update the elapsed time.
+        this.m_elapsedTime += 1000 * dt
+
+        Game::update()
+        this::renderGame()
+    }
+    CCScheduler::sharedScheduler()::scheduleScriptFunc(update, 0, false)
+}
+
+// Called when a tetromino landed
+function Platform::onTetrominoLanded() {
+    if (! this.m_musicMute) {
+        SimpleAudioEngine::sharedEngine()::playEffect("tetris/fx_drop.wav");
+    }
+}
+
+// Called when a line was made
+function Platform::onFilledRows(lines) {
+    if (! this.m_musicMute) {
+        SimpleAudioEngine::sharedEngine()::playEffect("tetris/fx_line.wav");
+    }
+}
+
+// Draw a tile from a tetromino
+function Platform::drawTile(x, y, tile, shadow) {
+    if (!shadow) {
+        this.m_tiles[tile]::setPosition(x + TILE_SIZE / 2, this.m_yOffset - y - TILE_SIZE / 2);
+        this.m_tiles[tile]::visit();
+    }
+    else {
+        this.m_shadows[tile]::setPosition(x + TILE_SIZE / 2 - 1, this.m_yOffset - y - TILE_SIZE / 2);
+        this.m_shadows[tile]::visit();
+    }
+}
+
+// Draw a number on the given position
+function Platform::drawNumber(x, y, number, length, color) {
+    var pos = 0
+    do {
+        var px = x + NUMBER_WIDTH * (length - pos)
+        this.m_numbers[color][number % 10]::setPosition(px + NUMBER_WIDTH / 2 + 1,
+                                                        this.m_yOffset - y - NUMBER_HEIGHT / 2)
+        this.m_numbers[color][number % 10]::visit()
+
+        number = math.floor(number / 10)
+        pos += 1
+
+    } while (pos < length)
+}
+
+// Render the state of the game using platform functions.
+function Platform::renderGame() {
+    var i, j
+
+    // Check if the game state has changed, if so redraw
+    if (!Game::isPaused() && (Game::hasChanged() || Game::hasMoved())) {
+    	this.m_canvas::beginWithClear(0, 0, 0, 0)
+
+        // Draw preview block
+        if (Game::showPreview()) {
+            for (i = 0; i < Game.TETROMINO_SIZE; i += 1) {
+                for (j = 0; j < Game.TETROMINO_SIZE; j += 1) {
+                    if (Game::nextBlock().cells[i][j] != Game.Cell.EMPTY) {
+                        this::drawTile(PREVIEW_X + (TILE_SIZE * i),
+                                       PREVIEW_Y + (TILE_SIZE * j),
+                                       Game::nextBlock().cells[i][j], false)
+                    }
+                }
+            }
+        }
+
+        // Draw shadow tetromino
+        if (Game::showShadow() && Game::shadowGap() > 0) {
+            for (i = 0; i < Game.TETROMINO_SIZE; i += 1) {
+                for (j = 0; j < Game.TETROMINO_SIZE; j += 1) {
+                    if (Game::fallingBlock().cells[i][j] != Game.Cell.EMPTY) {
+                        this::drawTile(BOARD_X + (TILE_SIZE * (Game::fallingBlock().x + i)),
+                                       BOARD_Y + (TILE_SIZE * (Game::fallingBlock().y + Game::shadowGap() + j)),
+                                       Game::fallingBlock().cells[i][j], true)
+                    }
+                }
+            }
+        }
+
+        // Draw the cells in the board
+        for (i = 0; i < Game.BOARD_TILEMAP_WIDTH; i += 1) {
+            for (j = 0; j < Game.BOARD_TILEMAP_HEIGHT; j += 1) {
+                if (Game::getCell(i, j) != Game.Cell.EMPTY) {
+                    this::drawTile(BOARD_X + (TILE_SIZE * i),
+                                   BOARD_Y + (TILE_SIZE * j),
+                                   Game::getCell(i, j), false)
+                }
+            }
+        }
+
+        // Draw falling tetromino
+        for (i = 0; i < Game.TETROMINO_SIZE; i += 1) {
+            for (j = 0; j < Game.TETROMINO_SIZE; j += 1) {
+                if (Game::fallingBlock().cells[i][j] != Game.Cell.EMPTY) {
+                    this::drawTile(BOARD_X + TILE_SIZE * (Game::fallingBlock().x + i),
+                                   BOARD_Y + TILE_SIZE * (Game::fallingBlock().y + j),
+                                   Game::fallingBlock().cells[i][j], false)
+                }
+            }
+        }
+
+        // Draw game statistic data
+        if (!Game::isPaused()) {
+            this::drawNumber(LEVEL_X, LEVEL_Y, Game::stats().level, LEVEL_LENGTH, Game.Cell.WHITE)
+            this::drawNumber(LINES_X, LINES_Y, Game::stats().lines, LINES_LENGTH, Game.Cell.WHITE)
+            this::drawNumber(SCORE_X, SCORE_Y, Game::stats().score, SCORE_LENGTH, Game.Cell.WHITE)
+
+            this::drawNumber(TETROMINO_X, TETROMINO_L_Y, Game::stats().pieces[Game.TetrominoType.L], TETROMINO_LENGTH, Game.Cell.ORANGE)
+            this::drawNumber(TETROMINO_X, TETROMINO_I_Y, Game::stats().pieces[Game.TetrominoType.I], TETROMINO_LENGTH, Game.Cell.CYAN)
+            this::drawNumber(TETROMINO_X, TETROMINO_T_Y, Game::stats().pieces[Game.TetrominoType.T], TETROMINO_LENGTH, Game.Cell.PURPLE)
+            this::drawNumber(TETROMINO_X, TETROMINO_S_Y, Game::stats().pieces[Game.TetrominoType.S], TETROMINO_LENGTH, Game.Cell.GREEN)
+            this::drawNumber(TETROMINO_X, TETROMINO_Z_Y, Game::stats().pieces[Game.TetrominoType.Z], TETROMINO_LENGTH, Game.Cell.RED)
+            this::drawNumber(TETROMINO_X, TETROMINO_O_Y, Game::stats().pieces[Game.TetrominoType.O], TETROMINO_LENGTH, Game.Cell.YELLOW)
+            this::drawNumber(TETROMINO_X, TETROMINO_J_Y, Game::stats().pieces[Game.TetrominoType.J], TETROMINO_LENGTH, Game.Cell.BLUE)
+
+            this::drawNumber(PIECES_X, PIECES_Y, Game::stats().totalPieces, PIECES_LENGTH, Game.Cell.WHITE)
+        }
+
+        // Inform the game that we are done with the changed state
+        Game::onChangeProcessed();
+        Game::onMoveProcessed();
+
+        this.m_canvas::finish()
+    }
+}
+
+function Platform::getSystemTime() {
+    return this.m_elapsedTime
+}
+
+function Platform::random() {
+    return math.random(1_000_000_000)
+}
+
+// Return platform instance
+return Platform
