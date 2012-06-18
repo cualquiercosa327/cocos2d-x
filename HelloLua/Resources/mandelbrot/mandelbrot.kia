@@ -43,6 +43,7 @@ var m_fractalZoneX2
 var m_fractalZoneY2
 
 var m_zoomIsVisible
+var m_isDrawingFractal
 
 // Fractal zones history.
 // Each element is an array with the zone coordinates: [x1, y1, x2, y2]
@@ -50,6 +51,10 @@ var m_zones
 
 // Some nice palette colors
 var m_palette
+
+var m_x
+var m_dx
+var m_dy
 
 //------------------------------------------------------------------------------
 // Logging messages
@@ -67,6 +72,63 @@ function drawZoomZone(x, y) {
     m_canvas::finish()
 }
 
+function drawSegmentMandelbrot() {
+    var px, py
+    var steps
+    var fx, fy
+    var temp
+
+    for (var y = 0; y < m_height; y += 1) {
+        // Point in fractal zone
+        px = m_fractalZoneX1 + m_x * m_dx
+        py = m_fractalZoneY1 + y * m_dy
+
+        // Iterate fractal computation.
+        steps = 0
+        fx = 0.0
+        fy = 0.0
+
+        while (true) {
+            // Mandelbrot recurrence:
+            // ---------------------
+            // F(n+1) = F(n)*F(n) + (px + i*py)
+            temp = fx*fx - fy*fy + px
+            fy = 2*fx*fy + py
+            fx = temp
+
+            steps += 1
+
+            // F(z) belongs to Mandelbrot set if |F(z)| < 2
+            // We give up if we passed the limit of number of iterations.
+            if ((steps >= m_steps) || (fx*fx + fy*fy >= 4.0)) {
+                break;
+            }
+        }
+
+        if (steps < m_steps) {
+            // We found that: |F(z)| >= 2 (the point doesn't belong to 
+            // the Mandelbrot set)
+            var indexColor = (steps - 1) % 28 + 1
+            if (indexColor > 15) {
+                indexColor = 30 - indexColor
+            }
+            // Sustractiong 0.5 to coordinates for correct rendering 
+            // in some points (it was plotting the x=239 pixel as x=240).
+            m_canvas::drawPoint(m_x - 0.5, y - 0.5,
+                                m_colors[indexColor][0]/255, 
+                                m_colors[indexColor][1]/255,
+                                m_colors[indexColor][2]/255)
+        }
+        else {
+            // We suspect this point belongs to the Mandelbrot set.
+            // We can't be sure because the point can belong to the set if 
+            // the number of iteration steps is increased.
+            // Leave this pixel in black.
+            m_canvas::drawPoint(m_x - 0.5, y - 0.5, 0, 0, 0)
+        }
+    }
+}
+
 function drawMandelbrot(initializeZone) {
 
     if (initializeZone) {
@@ -76,65 +138,13 @@ function drawMandelbrot(initializeZone) {
         m_fractalZoneY2 = 1.2
     }
 
-    var dx = (m_fractalZoneX2 - m_fractalZoneX1) / (m_width - 1)
-    var dy = (m_fractalZoneY2 - m_fractalZoneY1) / (m_height - 1)
+    m_dx = (m_fractalZoneX2 - m_fractalZoneX1) / (m_width - 1)
+    m_dy = (m_fractalZoneY2 - m_fractalZoneY1) / (m_height - 1)
 
-    m_canvas::beginWithClear(0, 0, 0, 1)
-
-    var px, py
-    var steps
-    var fx, fy
-    var temp
-
-    // Draw fractal zone
-    for (var x = 0; x < m_width; x += 1) {
-        for (var y = 0; y < m_height; y += 1) {
-            // Point in fractal zone
-            px = m_fractalZoneX1 + x * dx
-            py = m_fractalZoneY1 + y * dy
-
-            // Iterate fractal computation.
-            steps = 0
-            fx = 0.0
-            fy = 0.0
-
-            while (true) {
-                // Mandelbrot recurrence:
-                // ---------------------
-                // F(n+1) = F(n)*F(n) + (px + i*py)
-                temp = fx*fx - fy*fy + px
-                fy = 2*fx*fy + py
-                fx = temp
-
-                steps += 1
-
-                // F(z) belongs to Mandelbrot set if |F(z)| < 2
-                // We give up if we passed the limit of number of iterations.
-                if ((steps >= m_steps) || (fx*fx + fy*fy >= 4.0)) {
-                    break;
-                }
-            }
-
-            if (steps < m_steps) {
-                // We found that: |F(z)| >= 2 (the point doesn't belong to 
-                // the Mandelbrot set)
-                var indexColor = (steps - 1) % 28 + 1
-                if (indexColor > 15) {
-                    indexColor = 30 - indexColor
-                }
-                m_canvas::drawPoint(x, y,
-                                    m_colors[indexColor][0]/255, 
-                                    m_colors[indexColor][1]/255,
-                                    m_colors[indexColor][2]/255)
-            }
-            else {
-                // We suspect this point belongs to the Mandelbrot set.
-                // We can't be sure because the point can belong to the set if 
-                // the number of iteration steps is increased.
-                // Leave this pixel in black.
-            }
-        }
-    }
+    m_x = 0
+    m_isDrawingFractal = true
+    m_canvas::begin()
+    drawSegmentMandelbrot()
     m_canvas::finish()
 }
 
@@ -366,13 +376,15 @@ function init() {
     m_steps = INIT_STEPS
     m_zones = []
     m_zoomIsVisible = false
+    m_isDrawingFractal = false
 
     //--------------------------------------------------------------------------
     // Create menu of buttons on screen
     //
+    var halfSize = 20
     var btnPalette = CCMenuItemImage::itemFromNormalImage(
-                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
-    btnPalette::setPosition(-m_width / 2 + 16, -m_height / 2 + 16);
+                        "mandelbrot/random.png", "mandelbrot/button_on.png")
+    btnPalette::setPosition(-m_width / 2 + halfSize, -m_height / 2 + halfSize);
     function onBtnPaletteClicked() {
         setColors(COLOR_PALETTE)
         drawMandelbrot()
@@ -380,8 +392,8 @@ function init() {
     btnPalette::registerScriptHandler(onBtnPaletteClicked)
 
     var btnRandom = CCMenuItemImage::itemFromNormalImage(
-                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
-    btnRandom::setPosition(-m_width / 2 + 16, m_height / 2 - 16);
+                        "mandelbrot/random.png", "mandelbrot/button_on.png")
+    btnRandom::setPosition(-m_width / 2 + halfSize, m_height / 2 - halfSize);
     function onBtnRandomClicked() {
         setColors(COLOR_RANDOM)
         drawMandelbrot()
@@ -389,16 +401,16 @@ function init() {
     btnRandom::registerScriptHandler(onBtnRandomClicked)
 
     var btnBack = CCMenuItemImage::itemFromNormalImage(
-                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
-    btnBack::setPosition(m_width / 2 - 16, m_height / 2 - 16);
+                        "mandelbrot/back.png", "mandelbrot/button_on.png")
+    btnBack::setPosition(m_width / 2 - halfSize, m_height / 2 - halfSize);
     function onBtnBackClicked() {
         zoomOut()
     }
     btnBack::registerScriptHandler(onBtnBackClicked)
 
     var btnHome = CCMenuItemImage::itemFromNormalImage(
-                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
-    btnHome::setPosition(m_width / 2 - 16, -m_height / 2 + 16);
+                        "mandelbrot/home.png", "mandelbrot/button_on.png")
+    btnHome::setPosition(m_width / 2 - halfSize, -m_height / 2 + halfSize);
     function onBtnHomeClicked() {
         m_steps = INIT_STEPS
         drawMandelbrot(true)
@@ -406,16 +418,16 @@ function init() {
     btnHome::registerScriptHandler(onBtnHomeClicked)
 
     var btnStepsUp = CCMenuItemImage::itemFromNormalImage(
-                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
-    btnStepsUp::setPosition(0, m_height / 2 - 16);
+                        "mandelbrot/up.png", "mandelbrot/button_on.png")
+    btnStepsUp::setPosition(0, m_height / 2 - halfSize);
     function onBtnStepsUpClicked() {
         increaseSteps(INCREMENT_STEPS)
     }
     btnStepsUp::registerScriptHandler(onBtnStepsUpClicked)
 
     var btnStepsDown = CCMenuItemImage::itemFromNormalImage(
-                        "mandelbrot/button_off.png", "mandelbrot/button_on.png")
-    btnStepsDown::setPosition(0, -m_height / 2 + 16);
+                        "mandelbrot/down.png", "mandelbrot/button_on.png")
+    btnStepsDown::setPosition(0, -m_height / 2 + halfSize);
     function onBtnStepsDownClicked() {
         increaseSteps(-INCREMENT_STEPS)
     }
@@ -444,6 +456,22 @@ function init() {
 
     layer::registerScriptTouchHandler(onTouch)
     layer::setIsTouchEnabled(true)
+
+    // Schedule refresh update.
+    function update(dt) {
+        if (m_isDrawingFractal) {
+            if (m_x < m_width) {
+                m_canvas::begin();
+                drawSegmentMandelbrot()
+                m_canvas::finish();
+                m_x += 1
+                if (m_x >= m_width) {
+                    m_isDrawingFractal = false
+                }
+            }
+        }
+    }
+    CCScheduler::sharedScheduler()::scheduleScriptFunc(update, 0, false)
 
     //--------------------------------------------------------------------------
     // Initialize color data
